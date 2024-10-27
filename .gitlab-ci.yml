@@ -6,4 +6,4 @@ stages:
 linechecking:
   stage: checks
   script:
-    - bash ./util/pre-commit.sh
+    - bash ./util/pre-commit.sh --ignore-deps

@@ -2,9 +2,17 @@
 
 [Please see course website for full spec](https://cgi.cse.unsw.edu.au/~cs6080/NOW/assessments/assignments/ass4)
 
+## Changelog
+
+- 27/10/2024 - fix pre-commit hook and gitlab CI to ignore dependencies updates
+
+## Due date
+
 This assignment is due *Friday 15 November, 8pm*.
 
-Please run `./util/setup.sh` in your terminal before you begin. This will set up some checks in relation to the "Git Commit Requirements".
+## Compulsory setup
+
+Please run `./util/setup.sh` in your terminal before you begin. This will set up some checks in relation to the "Git Commit Requirements". If you ran this script before the MR rolled out specified in changelog, please run it again.
 
 It's important to note that you should **NOT** use any pre-built web app templates or any AI web app creators for this assignment.
 
@@ -269,7 +277,7 @@ For **component testing**, you must:
 - Ensure your tests have excellent **clarity** (well commented and code isn't overly complex)
 - Ensure your tests are **designed** well (logical ordering of tests, avoid any tests that aren't necessary or don't add any meaningful value)
 
-Vitest has been setup in your `frontend` folder, there is one example test file located at _`frontend/src/__test__`_, you are free to use it or using `cypress` for component testing.
+Vitest has been setup in your `frontend` folder, there is one example test file located at _`frontend/src/__test__`_, feel free to use it or use `cypress` for component testing.
 
 For **ui testing**, you must:
 
