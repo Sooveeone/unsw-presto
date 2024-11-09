@@ -5,6 +5,7 @@
 ## Changelog
 
 - 27/10/2024 - fix pre-commit hook and gitlab CI to ignore dependencies updates
+- 07/11/2024 - fix wrong expression of position in 2.3.6
 
 ## Due date
 
@@ -107,7 +108,7 @@ This feature set focuses solely on the ability to register, login, and logout. I
 
 #### 2.2.5. Creating slides & moving between
 
-- When visiting a particular slide, a button should be visible off the slides that allows users to create a new slide.
+- When visiting a particular slide, a button should be visible that allows users to create a new slide.
 - Creating a new slide will add another slide at the end of the slideshow deck.
 - Once the slideshow deck has at least two slides, controls should appear at a reasonable position in the slideshow deck:
   - These controls should be two arrows, left and right.
@@ -118,7 +119,7 @@ This feature set focuses solely on the ability to register, login, and logout. I
 
 #### 2.2.6. Deleting slides
 
-- When visiting a particular slide, a button should be visible off the slide, which allows users to delete that slide.
+- When visiting a particular slide, a button should be visible that allows users to delete that slide.
 - If a user tried to delete the only slide in the slideshow deck, an error message should popup instead asking to delete the presentation.
 
 Note: The behaviour after current slide is deleted could be implemented entirely up to your design. E.G. _redirect user to the previous slide_
@@ -164,7 +165,7 @@ Note: The behaviour after current slide is deleted could be implemented entirely
 - Somewhere on the slideshow edit screen, for each slide, there should be an action that is clearly described as adding a video to the current slide. This action can be immediately visible in a list of tools, or can be hidden away by some kind of collapsable panel.
   - When this action is clicked, a modal should appear and accept inputs from users for
     1. The size of the video area
-    2. The URL of the youtube video to display
+    2. The URL of the youtube video to display - Embedded video Url: E.G. https://www.youtube.com/embed/dQw4w9WgXcQ?si=ZVLBiX_k2dqcfdBt
     3. Whether or not the video should auto-play
 - Double clicking the video block will allow user to edit properties discussed above
 
@@ -198,7 +199,7 @@ Note: You can wrap a container out of `<video />` element to allow user editting
 
 - For all of `2.3.1`, `2.3.2`, `2.3.3`, `2.3.4`, and `2.3.5`, change it so that:
 
-  - When you double click on a block, position is no longer an option to edit the location of the block
+  - When you double click on a block, position is no longer an option to edit the size of the block
   - When you click on a block once, each of the 4 corners should now have a small `5px` x `5px` solid box on it, whereby:
 
     - If the user clicks and drags the corners, they can increase or decrease the size of the box.
