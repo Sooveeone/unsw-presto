@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
 
@@ -6,8 +6,27 @@ function Dashboard() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [presentationName, setPresentationName] = useState('');
+  const [presentationDescription, setPresentationDescription] = useState('');
   const [presentations, setPresentations] = useState([]);
 
+  // Fetch the presentations for the current user
+  const fetchStore = async () => {
+    try {
+      const response = await axios.get('/store', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setPresentations(response.data.store.presentations || []);
+    } catch (error) {
+      console.error("Failed to fetch presentations:", error);
+    }
+  };
+
+ 
+  useEffect(() => {
+    fetchStore();
+  }, []);
+
+ 
   const handleLogout = async () => {
     try {
       await axios.post('/admin/auth/logout');
@@ -18,11 +37,28 @@ function Dashboard() {
     }
   };
 
-  const handleCreatePresentation = () => {
-    const newPresentation = { name: presentationName, slides: [] };
-    setPresentations([...presentations, newPresentation]);
-    setShowModal(false);
-    setPresentationName(''); 
+
+  const handleCreatePresentation = async () => {
+    const newPresentation = {
+      id: `presentation-${Date.now()}`,
+      name: presentationName,
+      description: presentationDescription || "", 
+      thumbnail: "", 
+      slides: [{ id: `slide-${Date.now()}`, elements: [] }]
+    };
+
+    const updatedPresentations = [...presentations, newPresentation];
+    setPresentations(updatedPresentations);
+
+    // Save the data to the backend
+    try {
+      await axios.put('/store', { store: { presentations: updatedPresentations } });
+      setShowModal(false);
+      setPresentationName('');
+      setPresentationDescription(''); 
+    } catch (error) {
+      console.error("Failed to save presentation:", error);
+    }
   };
 
   return (
@@ -59,6 +95,13 @@ function Dashboard() {
                 placeholder="Presentation Name"
                 className="border p-2 w-full mb-4"
               />
+              <input 
+                type="text" 
+                value={presentationDescription} 
+                onChange={(e) => setPresentationDescription(e.target.value)} 
+                placeholder="Description (optional)"
+                className="border p-2 w-full mb-4"
+              />
               <div className="flex justify-end space-x-2">
                 <button 
                   onClick={() => setShowModal(false)} 
@@ -77,10 +120,17 @@ function Dashboard() {
           </div>
         )}
 
-        <div className="mt-6">
-          {presentations.map((presentation, index) => (
-            <div key={index} className="bg-white text-black p-4 rounded-lg shadow-lg mb-4">
-              {presentation.name}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {presentations.map((presentation) => (
+            <div 
+              key={presentation.id} 
+              className="bg-white text-black p-4 rounded-lg shadow-lg flex flex-col items-center"
+              style={{ width: '200px', height: '150px' }}
+            >
+              <div className="w-full h-20 bg-gray-300 mb-2"></div>
+              <h3 className="font-semibold">{presentation.name}</h3>
+              <p className="text-sm text-gray-600">{presentation.description || ""}</p>
+              <p className="text-xs text-gray-500">{presentation.slides.length} slides</p>
             </div>
           ))}
         </div>
