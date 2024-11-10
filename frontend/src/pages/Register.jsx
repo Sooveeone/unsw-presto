@@ -18,6 +18,12 @@ function Register() {
     }
     try {
       await axios.post('/admin/auth/register', { email, name, password });
+  
+      // Automatically will log in the user in by calling the login endpoint
+      const response = await axios.post('/admin/auth/login', { email, password });
+      localStorage.setItem('token', response.data.token);
+  
+      // Navigate to the dashboard
       navigate('/dashboard');
     } catch (err) {
       setError("Registration failed. Please try again.");
