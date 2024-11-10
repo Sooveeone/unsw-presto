@@ -41,30 +41,30 @@ function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-lightBlue to-lightGray text-white">
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-lightGray to-lightBlue text-white">
       <div className="flex items-center justify-between p-6">
         <div className="text-3xl font-bold">
           <span className="text-black px-2 py-1 rounded font-serif">Presto</span>
         </div>
         <div className="space-x-4">
-          <Link 
-            to="/login" 
-            className="text-black font-semibold hover:text-gray-200 transition duration-200"
+          <Link
+            to="/login"
+            className="px-4 py-2 bg-black text-white font-semibold rounded-lg hover:bg-white hover:text-black transition duration-220"
           >
             Login
           </Link>
-          <Link 
-            to="/register" 
-            className="text-black font-semibold hover:text-gray-200 transition duration-200"
+          <Link
+            to="/register"
+            className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-black hover:text-white transition duration-220"
           >
             Register
           </Link>
         </div>
       </div>
       <div className="flex flex-col items-center justify-center flex-grow text-center font-serif">
-        <h2 className="text-5xl font-bold mb-4 text-black">Welcome</h2>
-        <p className="text-lg mb-8 text-black font-bold">
-          Presto <span className="text-primaryBlue">{text}</span>
+        <h2 className="text-6xl font-bold mb-4 text-black italic">Welcome</h2>
+        <p className="text-2xl mb-8 text-black font-bold">
+          Presto <span className="text-white">{text}</span>
         </p>
       </div>
     </div>
