@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 function LandingPage() {
   const [loopNum, setLoopNum] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const toRotate = ["to success!", "unlocks your degree!", "builds your future!", "maps your degree path!", "drives your goals!", "simplifies your journey!"];
+  const toRotate = ["brings success!", "powers presentations!", "captures your audiences!", "inspires with every slide!", "elevates pitches!"];
   const [text, setText] = useState('');
   const [delta, setDelta] = useState(200 - Math.random() * 100);
-  const period = 1500;
+  const period = 1100;
 
   useEffect(() => {
     let ticker = setInterval(() => {
@@ -62,7 +62,7 @@ function LandingPage() {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center flex-grow text-center font-serif">
-        <h2 className="text-5xl font-bold mb-4 text-black">Welcome to Presto</h2>
+        <h2 className="text-5xl font-bold mb-4 text-black">Welcome</h2>
         <p className="text-lg mb-8 text-black font-bold">
           Presto <span className="text-primaryBlue">{text}</span>
         </p>
