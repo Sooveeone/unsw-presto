@@ -15,7 +15,7 @@ function PresentationEdit() {
   const [thumbnail, setThumbnail] = useState('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  // Fetch prsntations on mount
+  // Fetch presentations on mount
   const fetchPresentations = async () => {
     try {
       const response = await axios.get('/store', {
@@ -187,25 +187,51 @@ function PresentationEdit() {
       <div className="flex items-center justify-center space-x-4 mb-4">
         {currentSlideIndex > 0 && (
           <button onClick={navigateToPreviousSlide} className="p-2 text-blue-500">
-            ← Previous
+            ←
           </button>
         )}
         <span>Slide {currentSlideIndex + 1} of {presentation.slides.length}</span>
         {currentSlideIndex < presentation.slides.length - 1 && (
           <button onClick={navigateToNextSlide} className="p-2 text-blue-500">
-            Next →
+            →
           </button>
         )}
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
+      {/* Slide Content */}
+      <div
+        className="bg-white p-8 rounded shadow relative"
+        style={{
+          width: '800px',  
+          height: '500px', 
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <p className="text-lg font-semibold">Slide {presentation.slides[currentSlideIndex].id}</p>
         <button
           onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
-          className="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+          className="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 absolute top-4 right-4"
         >
           Delete Slide
         </button>
+        
+        {/* Slide Number Display */}
+        <div
+          className="absolute bottom-2 left-2 flex items-center justify-center"
+          style={{
+            width: '50px',
+            height: '50px',
+            fontSize: '1em',
+            color: 'white',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: '4px',
+          }}
+        >
+          {currentSlideIndex + 1}
+        </div>
       </div>
 
       <button
