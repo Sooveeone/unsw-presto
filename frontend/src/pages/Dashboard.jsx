@@ -75,66 +75,88 @@ function Dashboard() {
         </button>
       </div>
 
-      <div className="flex flex-col items-center justify-center flex-grow text-center">
-        <h2 className="text-5xl font-bold mb-4 text-black">Dashboard</h2>
-        <button 
-          onClick={() => setShowModal(true)} 
-          className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-200 mt-4"
-        >
-          New Presentation
-        </button>
+      
+      <div className="flex flex-col md:flex-row flex-grow w-full p-6 space-y-6 md:space-y-0 md:space-x-6">
+        
+        <div className="w-3/4 md:w-1/5 max-w-xs mx-auto">
+          <button 
+            onClick={() => setShowModal(true)} 
+            className="w-full px-4 py-2 bg-primaryBlue text-platinum font-semibold rounded-lg transform transition-transform duration-500 delay-2000 hover:scale-105 md:mt-0"
+          >
+            Create
+          </button>
+        </div>
 
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-              <h3 className="text-2xl font-bold mb-4 text-gray-800">Create New Presentation</h3>
-              <input 
-                type="text" 
-                value={presentationName} 
-                onChange={(e) => setPresentationName(e.target.value)} 
-                placeholder="Presentation Name"
-                className="border p-2 w-full mb-4"
-              />
-              <input 
-                type="text" 
-                value={presentationDescription} 
-                onChange={(e) => setPresentationDescription(e.target.value)} 
-                placeholder="Description (optional)"
-                className="border p-2 w-full mb-4"
-              />
-              <div className="flex justify-end space-x-2">
-                <button 
-                  onClick={() => setShowModal(false)} 
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-200"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleCreatePresentation} 
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
-                >
-                  Create
-                </button>
+        {/* card area */}
+        <div className="flex-grow flex justify-center">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+            {presentations.map((presentation) => (
+              <div 
+                key={presentation.id} 
+                className="bg-platinum text-black max-w-md aspect-[2/1] rounded-lg shadow-lg flex flex-col transform transition-transform duration-500 delay-2000 hover:scale-105"
+              >
+                <div className=" flex-grow flex-2/3 p-0.5" >
+                  <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                    {/* thumbnail */}
+                    <span className="text-gray-500">Image Placeholder</span>
+                  </div>
+                </div>
+
+                {/* text area */}
+                <div className="w-full flex-1/3 text-sm md:text-base lg:text-lg flex flex-row justify-between" >
+                  <div className="h-full flex flex-col min-h-[5rem] px-0.5">
+                    <p className="font-semibold">{presentation.name}</p>
+                    {presentation.description && (
+                      <p className="text-sm text-gray-600">{presentation.description}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center px-0.5">
+                    <p className="text-sm text-gray-500"> {presentation.slides.length} slides</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
-
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {presentations.map((presentation) => (
-            <div 
-              key={presentation.id} 
-              className="bg-white text-black p-4 rounded-lg shadow-lg flex flex-col items-center"
-              style={{ width: '200px', height: '150px' }}
-            >
-              <div className="w-full h-20 bg-gray-300 mb-2"></div>
-              <h3 className="font-semibold">{presentation.name}</h3>
-              <p className="text-sm text-gray-600">{presentation.description || ""}</p>
-              <p className="text-xs text-gray-500">{presentation.slides.length} slides</p>
-            </div>
-          ))}
         </div>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-2xl font-bold mb-4 text-gray-800">New Presentation</h3>
+            <input 
+              type="text" 
+              value={presentationName} 
+              onChange={(e) => setPresentationName(e.target.value)} 
+              placeholder="Presentation Name"
+              className="border p-2 w-full mb-4 rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue text-gray-800"
+            />
+            <input 
+              type="text" 
+              value={presentationDescription} 
+              onChange={(e) => setPresentationDescription(e.target.value)} 
+              placeholder="Description (optional)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue text-gray-800"
+            />
+            <div className="flex justify-end space-x-2">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-200"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleCreatePresentation} 
+                className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition duration-200"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
