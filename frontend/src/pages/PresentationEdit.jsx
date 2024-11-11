@@ -10,11 +10,12 @@ function PresentationEdit() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditTitleModal, setShowEditTitleModal] = useState(false);
   const [showEditThumbnailModal, setShowEditThumbnailModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false); 
   const [editedTitle, setEditedTitle] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  // Fetch presentations on mount
+  // Fetch prsntations on mount
   const fetchPresentations = async () => {
     try {
       const response = await axios.get('/store', {
@@ -49,7 +50,6 @@ function PresentationEdit() {
     };
   }, [currentSlideIndex, presentation]);
 
-  // Handle thumbnail file selection
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -107,11 +107,16 @@ function PresentationEdit() {
 
   const deleteSlide = (slideId) => {
     if (!presentation) return;
+
+    if (presentation.slides.length === 1) {
+      setShowErrorModal(true);
+      return;
+    }
+
     const updatedSlides = presentation.slides.filter((slide) => slide.id !== slideId);
     
-    // Move to the previous slide if the last slide was deleted
     if (currentSlideIndex >= updatedSlides.length && currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1); 
+      setCurrentSlideIndex(currentSlideIndex - 1);
     }
     
     setPresentation({ ...presentation, slides: updatedSlides });
@@ -216,7 +221,22 @@ function PresentationEdit() {
         className="mt-6 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
       >
         Save Changes
-      </button> 
+      </button>
+
+      {/* Error Modal for Last Slide Deletion */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">This is the last slide in your presentation!</h3>
+            <p className="mb-4 text-gray-600">To delete this slide, you should delete the presentation instead.</p>
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => setShowErrorModal(false)} className="px-4 py-2 bg-lightGray rounded-lg hover:bg-gray-400">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )} 
 
       {/* Edit Title Modal */}
       {showEditTitleModal && (
