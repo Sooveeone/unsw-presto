@@ -12,6 +12,7 @@ function PresentationEdit() {
   const [showEditThumbnailModal, setShowEditThumbnailModal] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [thumbnail, setThumbnail] = useState('');
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   // Fetch presentations on mount
   const fetchPresentations = async () => {
@@ -37,6 +38,17 @@ function PresentationEdit() {
     fetchPresentations();
   }, [presentationId]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowLeft') navigateToPreviousSlide();
+      if (event.key === 'ArrowRight') navigateToNextSlide();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentSlideIndex, presentation]);
+
   // Handle thumbnail file selection
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
@@ -49,7 +61,6 @@ function PresentationEdit() {
       reader.readAsDataURL(file);
     }
   };
-
 
   const saveUpdatedTitle = async () => {
     if (!presentation) return;
@@ -94,13 +105,29 @@ function PresentationEdit() {
     });
   };
 
-
   const deleteSlide = (slideId) => {
     if (!presentation) return;
     const updatedSlides = presentation.slides.filter((slide) => slide.id !== slideId);
+    
+    // Move to the previous slide if the last slide was deleted
+    if (currentSlideIndex >= updatedSlides.length && currentSlideIndex > 0) {
+      setCurrentSlideIndex(currentSlideIndex - 1); 
+    }
+    
     setPresentation({ ...presentation, slides: updatedSlides });
   };
 
+  const navigateToNextSlide = () => {
+    if (currentSlideIndex < presentation.slides.length - 1) {
+      setCurrentSlideIndex(currentSlideIndex + 1);
+    }
+  };
+
+  const navigateToPreviousSlide = () => {
+    if (currentSlideIndex > 0) {
+      setCurrentSlideIndex(currentSlideIndex - 1);
+    }
+  };
 
   const handleDeletePresentation = async () => {
     const updatedPresentations = allPresentations.filter((p) => p.id !== presentationId);
@@ -151,26 +178,37 @@ function PresentationEdit() {
         </div>
       )}
 
-      {/* Slides Section */}
-      <div className="flex flex-col space-y-4">
-        {presentation.slides.map((slide) => (
-          <div key={slide.id} className="bg-white p-4 rounded shadow">
-            <p className="text-lg font-semibold">Slide {slide.id}</p>
-            <button
-              onClick={() => deleteSlide(slide.id)}
-              className="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-            >
-              Delete Slide
-            </button>
-          </div>
-        ))}
+      {/* Slide Navigation Controls */}
+      <div className="flex items-center justify-center space-x-4 mb-4">
+        {currentSlideIndex > 0 && (
+          <button onClick={navigateToPreviousSlide} className="p-2 text-blue-500">
+            ← Previous
+          </button>
+        )}
+        <span>Slide {currentSlideIndex + 1} of {presentation.slides.length}</span>
+        {currentSlideIndex < presentation.slides.length - 1 && (
+          <button onClick={navigateToNextSlide} className="p-2 text-blue-500">
+            Next →
+          </button>
+        )}
+      </div>
+
+      <div className="bg-white p-4 rounded shadow">
+        <p className="text-lg font-semibold">Slide {presentation.slides[currentSlideIndex].id}</p>
         <button
-          onClick={addSlide}
-          className="self-start bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
+          className="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
         >
-          Add Slide
+          Delete Slide
         </button>
       </div>
+
+      <button
+        onClick={addSlide}
+        className="self-start mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Add New Slide
+      </button>
 
       {/* Save Changes Button */}
       <button
@@ -178,7 +216,7 @@ function PresentationEdit() {
         className="mt-6 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
       >
         Save Changes
-      </button>
+      </button> 
 
       {/* Edit Title Modal */}
       {showEditTitleModal && (
