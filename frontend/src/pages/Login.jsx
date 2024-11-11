@@ -36,8 +36,8 @@ function Login() {
         onSubmit={handleLogin} 
         className="bg-platinum p-8 rounded-3xl shadow-xl w-full max-w-md"
       >
-        <Link to="/" className="absolute top-4 left-4">
-          <span className="text-primaryBlue px-2 py-1 rounded font-serif text-xl font-bold hover:bg-lightGray">
+        <Link to="/" className="absolute top-6 left-6 transform transition-transform duration-300 hover:scale-110">
+          <span className="text-3xl font-bold text-black px-2 py-1 rounded font-serif ">
             Presto
           </span>
         </Link>

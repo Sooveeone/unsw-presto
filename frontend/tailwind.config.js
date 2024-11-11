@@ -14,6 +14,10 @@ export default {
         lightGray: '#E2E5EC',
         platinumGray: '#CAD6DB',
       },
+      flex: {
+        '2/3': '2 2 66.666%', 
+        '1/3': '1 1 33.333%', 
+      },
     },
   },
   plugins: [],
