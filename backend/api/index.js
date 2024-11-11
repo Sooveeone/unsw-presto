@@ -14,6 +14,7 @@ import {
   save,
   setStore,
 } from "./service";
+const { PROD_BACKEND_PORT, USE_VERCEL_KV } = process.env;
 
 const app = express();
 
@@ -106,15 +107,10 @@ app.get("/", (req, res) => res.redirect("/docs"));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const configData = JSON.parse(
-  fs.readFileSync("../frontend/backend.config.json")
-);
+const port = USE_VERCEL_KV
+  ? PROD_BACKEND_PORT
+  : JSON.parse(fs.readFileSync("../frontend/backend.config.json")).BACKEND_PORT;
 
-const port = "BACKEND_PORT" in configData ? configData.BACKEND_PORT : 5000;
-
-const server = app.listen(port, () => {
-  console.log(`Backend is now listening on port ${port}!`);
+app.listen(port, () => {
   console.log(`For API docs, navigate to http://localhost:${port}`);
 });
-
-export default server;

@@ -6,6 +6,7 @@
 
 - 27/10/2024 - fix pre-commit hook and gitlab CI to ignore dependencies updates
 - 07/11/2024 - fix wrong expression of position in 2.3.6
+- 10/11/2024 - remove squashing commit for merge requests to master & fix description of presentation & 2.3.6 resize
 
 ## Due date
 
@@ -82,7 +83,7 @@ This feature set focuses solely on the ability to register, login, and logout. I
 #### 2.2.1. New presentation on Dashboard
 
 - When logged in, users should be presented with a dashboard that contains a button, only visible on the dashboard, for creating new presentation. E.G "New presentation".
-- When this button is pressed, a popup([modal](https://www.w3schools.com/w3css/w3css_modal.asp)/[dialog](https://m2.material.io/components/dialogs)) appears, where a user can enter the `name` of a new presentation
+- When this button is pressed, a popup([modal](https://www.w3schools.com/w3css/w3css_modal.asp)/[dialog](https://m2.material.io/components/dialogs)) appears, where a user can enter the `name`, `description` and add thumbnail of a new presentation
 - This popup should contain a "Create" button for user to click and create presentation. The popup should disappear after user clicked "Create" button, a new presentation is created and appears on the dashboard. It is a default presentation containing a single empty slide (info on this later).
 
 #### 2.2.2. List of presentations on Dashboard
@@ -199,7 +200,7 @@ Note: You can wrap a container out of `<video />` element to allow user editting
 
 - For all of `2.3.1`, `2.3.2`, `2.3.3`, `2.3.4`, and `2.3.5`, change it so that:
 
-  - When you double click on a block, position is no longer an option to edit the size of the block
+  - When you double click on a block, size is no longer an option to edit the size of the block
   - When you click on a block once, each of the 4 corners should now have a small `5px` x `5px` solid box on it, whereby:
 
     - If the user clicks and drags the corners, they can increase or decrease the size of the box.
@@ -213,7 +214,7 @@ Note: You can wrap a container out of `<video />` element to allow user editting
 
 #### 2.4.1. Font adjustment
 
-- For each text box on the slide, on the slideshow edit screen, the user should be able to change its `font-family`, the user should be able to choose from at least 3 different font-famlies.
+- For all text boxes on the slide, on the slideshow edit screen, the user should be able to change the global `font-family` of them, the user should be able to choose from at least 3 different font-famlies.
 
 #### 2.4.2. Theme and background picker
 
