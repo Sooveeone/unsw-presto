@@ -89,38 +89,38 @@ function Dashboard() {
 
         {/* card area */}
         <div className="flex-grow flex justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {presentations.map((presentation) => (
-            <div 
-              key={presentation.id} 
-              onClick={() => navigate(`/${presentation.id}/edit`)}
-              className="bg-platinum text-black max-w-md aspect-[2/1] rounded-lg shadow-lg flex flex-col transform transition-transform duration-500 hover:scale-105 cursor-pointer"
-            >
-              <div className="flex-grow flex-2/3 p-0.5">
-                <div className="w-full h-full flex items-center justify-center bg-gray-300">
-                  {presentation.thumbnail ? (
-                    <img src={presentation.thumbnail} alt="Thumbnail" className="w-full h-full object-cover rounded" />
-                  ) : (
-                    <span className="text-gray-500">Image Placeholder</span>
-                  )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {presentations.map((presentation) => (
+              <div 
+                key={presentation.id} 
+                onClick={() => navigate(`/${presentation.id}/edit`)}
+                className="bg-platinum text-black max-w-md aspect-[2/1] rounded-lg shadow-lg flex flex-col transform transition-transform duration-500 hover:scale-105 cursor-pointer"
+              >
+                <div className="flex-grow flex-2/3 p-0.5">
+                  <div className="w-full h-40 flex items-center justify-center bg-gray-300">
+                    {presentation.thumbnail ? (
+                      <img src={presentation.thumbnail} alt="Thumbnail" className="w-full h-full object-contain rounded-lg" />
+                    ) : (
+                      <span className="text-gray-500">Image Placeholder</span>
+                    )}
+                  </div>
+                </div>
+                <div className="w-full flex-1/3 text-sm md:text-base lg:text-lg flex flex-row justify-between px-0.5">
+                  <div className="flex flex-col min-h-[5rem]">
+                    <p className="font-semibold">{presentation.name}</p>
+                    {presentation.description && (
+                      <p className="text-sm text-gray-600">{presentation.description}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center">
+                    <p className="text-sm text-gray-500">{presentation.slides.length} slides</p>
+                  </div>
                 </div>
               </div>
-              <div className="w-full flex-1/3 text-sm md:text-base lg:text-lg flex flex-row justify-between px-0.5">
-                <div className="flex flex-col min-h-[5rem]">
-                  <p className="font-semibold">{presentation.name}</p>
-                  {presentation.description && (
-                    <p className="text-sm text-gray-600">{presentation.description}</p>
-                  )}
-                </div>
-                <div className="flex items-center">
-                  <p className="text-sm text-gray-500">{presentation.slides.length} slides</p>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
 
       {/* Modal */}
       {showModal && (
