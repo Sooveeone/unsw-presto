@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
+import { HiHome, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle } from "react-icons/hi2";
+import { AiFillEdit } from "react-icons/ai";
 
 function PresentationEdit() {
   const { presentationId } = useParams();
@@ -155,32 +157,29 @@ function PresentationEdit() {
   };
 
   return (
-    <div className="flex flex-row min-h-screen p-4 bg-gradient-to-r from-lightGray to-lightBlue">
+    <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-lightGray to-lightBlue">
       {/*Sidebar on left */}
-      <div className="flex flex-col w-1/6 bg-gray-200 p-4 justify-between">
+      <div className="flex flex-col w-1/8 bg-black justify-between">
         {/* Back button refine later */}
-        <button
-          onClick={handleBackAndSave}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Back
-        </button>
+  
+        <HiHome 
+          onClick={handleBackAndSave} 
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />
+        
+        <HiTrash  
+          onClick={() => setShowDeleteModal(true)} 
+          className="text-primaryBlue w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+        />
 
-        {/* Delete button refine later */}
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="mt-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-        >
-          Delete
-        </button>
       </div>
 
       {/* Presentation area*/}
-      <div className="flex flex-col flex-grow p-4 space-y-6">
+      <div className="flex flex-col flex-grow p-2 space-y-4">
         {/*Title and Thumbnail */}
         <div className="flex flex-row items-center space-x-6">
           {/* Thumbnail */}
-          <div className="w-24 h-24 bg-gray-300 rounded flex items-center justify-center cursor-pointer">
+          <div className="w-25 h-20 bg-gray-300 rounded flex items-center justify-center cursor-pointer">
             {presentation.thumbnail ? (
               <img
                 src={presentation.thumbnail}
@@ -195,23 +194,28 @@ function PresentationEdit() {
                 + Update Thumbnail
               </span>
             )}
+            
+            <HiArrowUpOnSquare
+                onClick={() => setShowEditThumbnailModal(true)}
+                className=" bottom-1 right-1 text-primaryBlue w-5 h-5 cursor-pointer hover:scale-110 transition-transform duration-200"
+            />
+          </div>
+          <div>
           </div>
           {/* Title 区域 */}
-          <div className="flex items-center space-x-2">
-            <h2 className="text-2xl font-bold">{presentation.name}</h2>
-            <button
+          <div className="flex items-center justify-center space-x-2">
+            <h2 className="text-2xl font-bold flex items-center justify-center">{presentation.name}</h2>
+            <AiFillEdit
               onClick={() => setShowEditTitleModal(true)}
-              className="text-blue-500 underline"
-            >
-              Edit
-            </button>
+              className="text-primaryBlue w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+            />
           </div>
         </div>
         
 
 
         {/* Slideshow deck */}
-        <div className="flex flex-row flex-grow space-x-6">
+        <div className="flex flex-row flex-grow space-x-4">
           {/* Slide area*/}
           <div className="flex-grow flex items-center justify-center bg-white shadow-md rounded-lg">
             {/* show slides */}
@@ -225,46 +229,59 @@ function PresentationEdit() {
           </div>
 
           {/* Slideshow Deck Sidebar */}
-          <div className="w-1/6 flex flex-col">
-            <button
+          <div className="w-1/8 flex flex-col">
+            {/* <button
               onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              className="px-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
             >
               Delete Slide
-            </button>
+            </button> */}
+            <HiTrash  
+              onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
+              className="text-red-500 w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+            />
           </div>
 
         </div>
         
         {/* Control Panel */}
-        <div className="flex flex-row items-center justify-between bg-white p-4 rounded-lg shadow-md">
+        <div className="flex flex-row items-center justify-between  p-1 rounded-lg shadow-md">
           {/* Add Slide 按钮 */}
-          <button
-            onClick={addSlide}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-          >
-            Add Slide
-          </button>
+          <div className="flex-1 flex justify-center">
+            {/* <button
+              onClick={addSlide}
+              className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-green-600"
+            >
+              Add Slide
+            </button> */}
+            <HiPlusCircle 
+              onClick={addSlide}
+              className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
+            />
+          </div>
           
           {/* Previous and Next Slide Buttons */}
-          <div className="flex space-x-4">
-            {currentSlideIndex > 0 && (
-              <button
-                onClick={navigateToPreviousSlide}
-                className="p-2 text-blue-500"
-              >
-                ←
-              </button>
-            )}
-            {currentSlideIndex < presentation.slides.length - 1 && (
-              <button
-                onClick={navigateToNextSlide}
-                className="p-2 text-blue-500"
-              >
-                →
-              </button>
-            )}
+          <div className="flex flex-row items-center space-x-4">
+            {/* Previous Slide Button */}
+            <HiChevronLeft
+              onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
+              className={`w-8 h-8 cursor-pointer transition-transform duration-200 ${
+                currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-primaryBlue hover:scale-110"
+              }`}
+            />
+
+            {/* Next Slide Button */}
+            <HiChevronRight
+              onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
+              className={`w-8 h-8 cursor-pointer transition-transform duration-200 ${
+                currentSlideIndex === presentation.slides.length - 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-primaryBlue hover:scale-110"
+              }`}
+            />
           </div>
+
+
         </div>
 
 
