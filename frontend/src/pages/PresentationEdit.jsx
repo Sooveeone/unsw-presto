@@ -17,6 +17,7 @@ function PresentationEdit() {
   const [thumbnail, setThumbnail] = useState('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showAddTextModal, setShowAddTextModal] = useState(false);
+  const [showAddImageModal, setShowAddImageModal] = useState(false); 
   const [newTextElement, setNewTextElement] = useState({
     text: '',
     width: 50,
@@ -26,13 +27,39 @@ function PresentationEdit() {
     position: { x: 0, y: 0 }
   });
 
+  const [newImageElement, setNewImageElement] = useState({
+    src: '',
+    width: 50,
+    height: 30,
+    alt: '',
+    position: { x: 0, y: 0 }
+  });
+
+  const handleAddImageElement = () => {
+    const newElement = {
+      id: `element-${Date.now()}`,
+      type: 'image',
+      ...newImageElement,
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1
+    };
+
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: [...slide.elements, newElement] }
+        : slide
+    );
+
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowAddImageModal(false);
+  };
+
   // Handle add text elements
   const handleAddTextElement = () => {
     const newElement = {
       id: `element-${Date.now()}`,
       type: 'text',
       ...newTextElement,
-      zIndex: presentation.slides[currentSlideIndex].elements.length + 1 // make sure on the top
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
     };
 
     const updatedSlides = presentation.slides.map((slide, index) =>
@@ -50,6 +77,14 @@ function PresentationEdit() {
     if (element) {
       setNewTextElement({ ...element });
       setShowAddTextModal(true);
+    }
+  };
+
+  const handleEditImageElement = (elementId) => {
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (element && element.type === 'image') {
+      setNewImageElement({ ...element });
+      setShowAddImageModal(true);
     }
   };
 
@@ -193,6 +228,18 @@ function PresentationEdit() {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewImageElement({ ...newImageElement, src: reader.result });
+      };
+      reader.onerror = () => console.error("Error reading image file");
+      reader.readAsDataURL(file);
+    }
+  };
+  
   if (!presentation) {
     return <div>Loading.....</div>;
   }
@@ -220,7 +267,7 @@ function PresentationEdit() {
         />
 
         <AiFillFileImage
-          // onClick={handleBackAndSave} 
+          onClick={() => setShowAddImageModal(true)} 
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
         />
 
@@ -294,14 +341,15 @@ function PresentationEdit() {
                 {currentSlideIndex + 1}
               </div>
 
-              {/* Render Text Elements */}
+              {/* Render elements */}
               {presentation.slides[currentSlideIndex].elements.map((element) => (
                 <div
                   key={element.id}
-                  onDoubleClick={() => handleEditTextElement(element.id)}
+                  onDoubleClick={() => element.type === 'text' ? handleEditTextElement(element.id) : handleEditImageElement(element.id)}
                   onContextMenu={(e) => {
-                    e.preventDefault(); 
-                    handleDeleteElement(element.id); 
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDeleteElement(element.id);
                   }}
                   style={{
                     position: 'absolute',
@@ -309,14 +357,16 @@ function PresentationEdit() {
                     left: `${element.position.x}%`,
                     width: `${element.width}%`,
                     height: `${element.height}%`,
-                    fontSize: `${element.fontSize}em`,
+                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
                     color: element.color,
-                    border: '1px solid #d3d3d3',
                     zIndex: element.zIndex,
+                    border: element.type === 'text' ? '1px solid #d3d3d3' : 'none'
                   }}
                   className="overflow-hidden"
                 >
-                  {element.text}
+                  {element.type === 'text' ? element.text : (
+                    <img src={element.src} alt={element.alt} className="object-cover w-full h-full" />
+                  )}
                 </div>
               ))}
             </div>
@@ -469,7 +519,8 @@ function PresentationEdit() {
       )}
 
       {showAddTextModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ zIndex: 1000 }}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">Add Text Element</h3>
             <input
@@ -517,6 +568,59 @@ function PresentationEdit() {
           </div>
         </div>
       )}
+      
+      {showAddImageModal && (
+        <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ zIndex: 1000 }} 
+      >
+        <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+          <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Image Element</h3>
+          <input
+            type="text"
+            value={newImageElement.src}
+            onChange={(e) => setNewImageElement({ ...newImageElement, src: e.target.value })}
+            placeholder="Image URL"
+            className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+          />
+          <input
+            type="file"
+            onChange={handleImageUpload}
+            className="border p-2 w-full mb-4 rounded focus:outline-none"
+          />
+          <input
+            type="text"
+            value={newImageElement.alt}
+            onChange={(e) => setNewImageElement({ ...newImageElement, alt: e.target.value })}
+            placeholder="Alt Description"
+            className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+          />
+          <input
+            type="number"
+            value={newImageElement.width}
+            onChange={(e) => setNewImageElement({ ...newImageElement, width: e.target.value })}
+            placeholder="Width (%)"
+            className="border p-2 w-full mb-4 rounded focus:outline-none"
+          />
+          <input
+            type="number"
+            value={newImageElement.height}
+            onChange={(e) => setNewImageElement({ ...newImageElement, height: e.target.value })}
+            placeholder="Height (%)"
+            className="border p-2 w-full mb-4 rounded focus:outline-none"
+          />
+          <div className="flex justify-end space-x-2">
+            <button onClick={() => setShowAddImageModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+              Cancel
+            </button>
+            <button onClick={handleAddImageElement} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
     </div>
   );
 }
