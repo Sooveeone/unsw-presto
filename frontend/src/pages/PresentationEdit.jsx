@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
-import { HiHome, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle } from "react-icons/hi2";
-import { AiFillEdit } from "react-icons/ai";
+import { HiHome, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
+import { AiFillEdit, AiFillFileImage } from "react-icons/ai";
 
 function PresentationEdit() {
   const { presentationId } = useParams();
@@ -16,6 +16,53 @@ function PresentationEdit() {
   const [editedTitle, setEditedTitle] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [showAddTextModal, setShowAddTextModal] = useState(false);
+  const [newTextElement, setNewTextElement] = useState({
+    text: '',
+    width: 50,
+    height: 20,
+    fontSize: 1,
+    color: '#000000',
+    position: { x: 0, y: 0 }
+  });
+
+  // Handle add text elements
+  const handleAddTextElement = () => {
+    const newElement = {
+      id: `element-${Date.now()}`,
+      type: 'text',
+      ...newTextElement,
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1 // make sure on the top
+    };
+
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: [...slide.elements, newElement] }
+        : slide
+    );
+
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowAddTextModal(false);
+  };
+
+  const handleEditTextElement = (elementId) => {
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (element) {
+      setNewTextElement({ ...element });
+      setShowAddTextModal(true);
+    }
+  };
+
+  const handleDeleteElement = (elementId) => {
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: slide.elements.filter(el => el.id !== elementId) }
+        : slide
+    );
+    setPresentation({ ...presentation, slides: updatedSlides });
+  };
+  
+////////////////////////////////////////////////////////////////
 
   // Fetch presentations on mount
   const fetchPresentations = async () => {
@@ -166,6 +213,26 @@ function PresentationEdit() {
           onClick={handleBackAndSave} 
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
         />
+
+        <HiPencil
+          onClick={() => setShowAddTextModal(true)}
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />
+
+        <AiFillFileImage
+          // onClick={handleBackAndSave} 
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />
+
+        <HiVideoCamera 
+          // onClick={handleBackAndSave} 
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />
+
+        <HiCommandLine
+          // onClick={handleBackAndSave} 
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />  
         
         <HiTrash  
           onClick={() => setShowDeleteModal(true)} 
@@ -216,6 +283,7 @@ function PresentationEdit() {
 
         {/* Slideshow deck */}
         <div className="flex flex-row flex-grow space-x-4">
+
           {/* Slide area*/}
           <div className="flex-grow flex items-center justify-center bg-white shadow-md rounded-lg">
             {/* show slides */}
@@ -225,6 +293,32 @@ function PresentationEdit() {
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center">
                 {currentSlideIndex + 1}
               </div>
+
+              {/* Render Text Elements */}
+              {presentation.slides[currentSlideIndex].elements.map((element) => (
+                <div
+                  key={element.id}
+                  onDoubleClick={() => handleEditTextElement(element.id)}
+                  onContextMenu={(e) => {
+                    e.preventDefault(); 
+                    handleDeleteElement(element.id); 
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: `${element.position.y}%`,
+                    left: `${element.position.x}%`,
+                    width: `${element.width}%`,
+                    height: `${element.height}%`,
+                    fontSize: `${element.fontSize}em`,
+                    color: element.color,
+                    border: '1px solid #d3d3d3',
+                    zIndex: element.zIndex,
+                  }}
+                  className="overflow-hidden"
+                >
+                  {element.text}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -368,6 +462,56 @@ function PresentationEdit() {
               </button>
               <button onClick={handleDeletePresentation} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddTextModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">Add Text Element</h3>
+            <input
+              type="text"
+              value={newTextElement.text}
+              onChange={(e) => setNewTextElement({ ...newTextElement, text: e.target.value })}
+              placeholder="Text Content"
+              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+            />
+            <input
+              type="number"
+              value={newTextElement.width}
+              onChange={(e) => setNewTextElement({ ...newTextElement, width: e.target.value })}
+              placeholder="Width (%)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <input
+              type="number"
+              value={newTextElement.height}
+              onChange={(e) => setNewTextElement({ ...newTextElement, height: e.target.value })}
+              placeholder="Height (%)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <input
+              type="number"
+              value={newTextElement.fontSize}
+              onChange={(e) => setNewTextElement({ ...newTextElement, fontSize: e.target.value })}
+              placeholder="Font Size (em)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <input
+              type="color"
+              value={newTextElement.color}
+              onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => setShowAddTextModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                Cancel
+              </button>
+              <button onClick={handleAddTextElement} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Add
               </button>
             </div>
           </div>
