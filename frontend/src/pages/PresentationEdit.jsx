@@ -3,6 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
 import { HiHome, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
 import { AiFillEdit, AiFillFileImage } from "react-icons/ai";
+import hljs from 'highlight.js';
+import 'highlight.js/styles/default.css';
+import javascript from 'highlight.js/lib/languages/javascript';
+import python from 'highlight.js/lib/languages/python';
+import c from 'highlight.js/lib/languages/c';
+
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('c', c);
 
 function PresentationEdit() {
   const { presentationId } = useParams();
@@ -18,6 +27,16 @@ function PresentationEdit() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showAddTextModal, setShowAddTextModal] = useState(false);
   const [showAddImageModal, setShowAddImageModal] = useState(false); 
+  const [showAddVideoModal, setShowAddVideoModal] = useState(false);
+  const [showAddCodeModal, setShowAddCodeModal] = useState(false);
+  const [newCodeElement, setNewCodeElement] = useState({
+    code: '',
+    language: 'javascript', 
+    width: 50,
+    height: 30,
+    fontSize: 1,
+    position: { x: 0, y: 0 },
+  });
   const [newTextElement, setNewTextElement] = useState({
     text: '',
     width: 50,
@@ -30,6 +49,11 @@ function PresentationEdit() {
   const [isEditingElement, setIsEditingElement] = useState(false); // is txt editing
   const [editingElementId, setEditingElementId] = useState(null); // add editing elment logic
 
+  const [isEditingVideo, setIsEditingVideo] = useState(false);
+  const [editingVideoElementId, setEditingVideoElementId] = useState(null);
+
+  const [isEditingCode, setIsEditingCode] = useState(false);
+  const [editingCodeElementId, setEditingCodeElementId] = useState(null);
 
 
   const [newImageElement, setNewImageElement] = useState({
@@ -37,6 +61,15 @@ function PresentationEdit() {
     width: 50,
     height: 30,
     alt: '',
+    position: { x: 0, y: 0 }
+  });
+
+  
+  const [newVideoElement, setNewVideoElement] = useState({
+    src: '',
+    width: 50,
+    height: 30,
+    autoplay: false,
     position: { x: 0, y: 0 }
   });
 
@@ -59,43 +92,26 @@ function PresentationEdit() {
   };
 
   // Handle add text elements
-  const handleAddTextElement = () => {
-    const newElement = {
-      id: `element-${Date.now()}`,
-      type: 'image',
-      ...newImageElement,
-      zIndex: presentation.slides[currentSlideIndex].elements.length + 1
-    };
-
-    const updatedSlides = presentation.slides.map((slide, index) =>
-      index === currentSlideIndex
-        ? { ...slide, elements: [...slide.elements, newElement] }
-        : slide
-    );
-
-    setPresentation({ ...presentation, slides: updatedSlides });
-    setShowAddImageModal(false);
+ // Handle add text elements ********************************
+ const handleAddTextElement = () => {
+  const newElement = {
+    id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    type: 'text',
+    ...newTextElement,
+    zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
   };
+
+  const updatedSlides = presentation.slides.map((slide, index) =>
+    index === currentSlideIndex
+      ? { ...slide, elements: [...slide.elements, newElement] }
+      : slide
+  );
+
+  setPresentation({ ...presentation, slides: updatedSlides });
+  setShowAddTextModal(false);
+};
 
   // Handle add text elements ********************************
-  const handleAddTextElement = () => {
-    const newElement = {
-      id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-      type: 'text',
-      ...newTextElement,
-      zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
-    };
-
-    const updatedSlides = presentation.slides.map((slide, index) =>
-      index === currentSlideIndex
-        ? { ...slide, elements: [...slide.elements, newElement] }
-        : slide
-    );
-
-    setPresentation({ ...presentation, slides: updatedSlides });
-    setShowAddTextModal(false);
-  };
-
   const handleEditTextElement = (elementId) => {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
     if (element) {
@@ -114,13 +130,6 @@ function PresentationEdit() {
     }
   };
 
-  const handleEditImageElement = (elementId) => {
-    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
-    if (element && element.type === 'image') {
-      setNewImageElement({ ...element });
-      setShowAddImageModal(true);
-    }
-  };
 
   const handleDeleteElement = (elementId) => {
     const updatedSlides = presentation.slides.map((slide, index) =>
@@ -148,6 +157,72 @@ function PresentationEdit() {
     setShowAddTextModal(false); 
     setIsEditingElement(false); 
     setEditingElementId(null); 
+  };
+
+  const handleAddVideoElement = () => {
+    const embeddedURL = convertToEmbeddedURL(newVideoElement.src);
+  
+    if (isEditingVideo) {
+      // Update existing element
+      const updatedSlides = presentation.slides.map((slide, index) => {
+        if (index === currentSlideIndex) {
+          return {
+            ...slide,
+            elements: slide.elements.map(el =>
+              el.id === editingVideoElementId ? { ...newVideoElement, id: editingVideoElementId, src: embeddedURL } : el
+            ),
+          };
+        }
+        return slide;
+      });
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+      setIsEditingVideo(false);
+      setEditingVideoElementId(null);
+    } else {
+      // Create new element
+      const newElement = {
+        id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        type: 'video',
+        src: embeddedURL,
+        width: newVideoElement.width,
+        height: newVideoElement.height,
+        autoplay: newVideoElement.autoplay,
+        position: newVideoElement.position,
+        zIndex: presentation.slides[currentSlideIndex].elements.length + 1
+      };
+  
+      const updatedSlides = presentation.slides.map((slide, index) =>
+        index === currentSlideIndex
+          ? { ...slide, elements: [...slide.elements, newElement] }
+          : slide
+      );
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+    }
+  
+    setShowAddVideoModal(false);
+  };
+  
+  const handleEditVideoElement = (elementId) => {
+    console.log(`Editing video element with id: ${elementId}`);
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (element && element.type === 'video') {
+      setNewVideoElement({ ...element });
+      setEditingVideoElementId(elementId);
+      setIsEditingVideo(true);
+      setShowAddVideoModal(true);
+    } else {
+      console.error("Video element not found or not a video type.");
+    }
+  };
+
+  
+
+  const convertToEmbeddedURL = (url) => {
+    const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/;
+    const match = url.match(regex);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : url;
   };
   
 //****************************************************** 
@@ -294,6 +369,90 @@ function PresentationEdit() {
     }
   };
   
+  const handleAddCodeElement = () => {
+    const newElement = {
+      id: `element-${Date.now()}`,
+      type: 'code',
+      ...newCodeElement,
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
+    };
+
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: [...slide.elements, newElement] }
+        : slide
+    );
+
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowAddCodeModal(false);
+  };
+
+  const handleEditCodeElement = (elementId) => {
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (element && element.type === 'code') {
+      setNewCodeElement({ ...element });
+      setEditingCodeElementId(elementId);
+      setIsEditingCode(true);
+      setShowAddCodeModal(true);
+    }
+  };
+
+  const handleUpdateCodeElement = () => {
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? {
+            ...slide,
+            elements: slide.elements.map((el) =>
+              el.id === editingCodeElementId
+                ? { ...newCodeElement, id: editingCodeElementId }
+                : el
+            ),
+          }
+        : slide
+    );
+  
+    setPresentation({ ...presentation, slides: updatedSlides });
+  
+    setTimeout(() => {
+      const codeElement = document.querySelector(`pre[data-id="${editingCodeElementId}"] code`);
+      if (codeElement) {
+        codeElement.className = `language-${newCodeElement.language}`;
+        hljs.highlightElement(codeElement); 
+      }
+    }, 0);
+  
+    setShowAddCodeModal(false);
+    setIsEditingCode(false);
+    setEditingCodeElementId(null);
+  };
+
+  const renderCodeElement = (element) => (
+    <pre
+      data-id={element.id} 
+      style={{
+        position: 'absolute',
+        top: `${element.position.y}%`,
+        left: `${element.position.x}%`,
+        width: `${element.width}%`,
+        height: `${element.height}%`,
+        fontSize: `${element.fontSize}em`,
+        zIndex: element.zIndex,
+        overflow: 'hidden',
+      }}
+      onDoubleClick={() => handleEditCodeElement(element.id)}
+    >
+      <code className={`language-${element.language}`}>
+        {element.code}
+      </code>
+    </pre>
+  );
+
+  useEffect(() => {
+    if (presentation) {
+      setTimeout(() => hljs.highlightAll(), 0);
+    }
+  }, [presentation]);
+
   if (!presentation) {
     return <div>Loading.....</div>;
   }
@@ -326,13 +485,35 @@ function PresentationEdit() {
         />
 
         <HiVideoCamera 
-          // onClick={handleBackAndSave} 
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+           onClick={() => {
+            setNewVideoElement({
+              src: '',
+              width: 50,
+              height: 30,
+              autoplay: false,
+              position: { x: 0, y: 0 }
+            });
+            setShowAddVideoModal(true);
+          }}
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
         />
 
         <HiCommandLine
-          // onClick={handleBackAndSave} 
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+           onClick={() => {
+            setNewCodeElement({
+              code: '',
+              language: 'javascript',
+              width: 50,
+              height: 30,
+              fontSize: 1,
+              position: { x: 0, y: 0 },
+            });
+            // Reset to add modal mode
+            setIsEditingCode(false); 
+            setEditingCodeElementId(null); 
+            setShowAddCodeModal(true);
+          }}
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
         />  
         
         <HiTrash  
@@ -398,31 +579,97 @@ function PresentationEdit() {
               {/* Render elements */}
               {presentation.slides[currentSlideIndex].elements.map((element) => (
                 <div
-                  key={element.id}
-                  onDoubleClick={() => element.type === 'text' ? handleEditTextElement(element.id) : handleEditImageElement(element.id)}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleDeleteElement(element.id);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    top: `${element.position.y}%`,
-                    left: `${element.position.x}%`,
-                    width: `${element.width}%`,
-                    height: `${element.height}%`,
-                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
-                    color: element.color,
-                    zIndex: element.zIndex,
-                    border: element.type === 'text' ? '1px solid #d3d3d3' : 'none'
-                  }}
-                  className="overflow-hidden"
-                >
-                  {element.type === 'text' ? element.text : (
-                    <img src={element.src} alt={element.alt} className="object-cover w-full h-full" />
-                  )}
-                </div>
-              ))}
+                 key={element.id}
+                 onDoubleClick={() =>
+                  element.type === 'text'
+                    ? handleEditTextElement(element.id)
+                    : element.type === 'image'
+                    ? handleEditImageElement(element.id)
+                    : element.type === 'code'
+                    ? handleEditCodeElement(element.id)
+                    : element.type === 'video'
+                    ? handleEditVideoElement(element.id)
+                    : null
+                 }
+                 onContextMenu={(e) => {
+                   e.preventDefault();
+                   e.stopPropagation();
+                   handleDeleteElement(element.id);
+                 }}
+                 style={{
+                   position: 'absolute',
+                   top: `${element.position.y}%`,
+                   left: `${element.position.x}%`,
+                   width: `${element.width}%`,
+                   height: `${element.height}%`,
+                   fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
+                   color: element.color,
+                   zIndex: element.zIndex,
+                   border: element.type === 'video' ? '2px dashed blue' : 'none'
+                 }}
+                 className="overflow-hidden"
+               >
+                 {element.type === 'text' ? (
+                   element.text
+                 ) : element.type === 'image' ? (
+                   <img src={element.src} alt={element.alt} className="object-cover w-full h-full" />
+                 ) : element.type === 'video' ? (
+                      <div
+                      style={{
+                          position: 'absolute',
+                          top: `${element.position.y}%`,
+                          left: `${element.position.x}%`,
+                          width: `${element.width}%`,
+                          height: `${element.height}%`,
+                          zIndex: element.zIndex,
+                          border: '2px dashed blue',
+                          boxSizing: 'border-box',
+                        }}
+                        onClick={(e) => {
+                          // Enable interactivity on single click
+                          e.stopPropagation();
+                          const iframe = e.currentTarget.querySelector('iframe');
+                          if (iframe) {
+                            iframe.style.pointerEvents = 'auto';
+                          }
+                        }}
+                        onDoubleClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log(`Double-clicked video element with id: ${element.id}`);
+                          handleEditVideoElement(element.id);
+                    
+                          
+                        }}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("Deleting");
+                          console.log("Deleting");
+                          console.log("Deleting");
+                          console.log("Deleting");
+                          console.log("Deleting");
+                          handleDeleteElement(element.id);
+                        }}
+                        className="video-container"
+                      >
+                        <iframe
+                          src={`${element.src}${element.autoplay ? '?autoplay=1' : ''}`}
+                          width="100%"
+                          height="100%"
+                          allow="autoplay"
+                          frameBorder="0"
+                          allowFullScreen
+                          style={{
+                            pointerEvents: 'none', // Start with non-interactive
+                            objectFit: 'cover', // Ensure proper resizing behavior
+                          }}
+                          className="object-cover"
+                        />
+                      </div>
+                  ) : element.type === 'code' ? renderCodeElement(element): null} 
+               </div>
+             ))}
             </div>
           </div>
 
@@ -706,6 +953,171 @@ function PresentationEdit() {
           </div>
         </div>
       )}
+
+      {showAddVideoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 1000 }}>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              {newVideoElement.id ? 'Edit Video Element' : 'Add Video Element'}
+            </h3>
+            <input
+              type="text"
+              value={newVideoElement.src}
+              onChange={(e) => setNewVideoElement({ ...newVideoElement, src: e.target.value })}
+              placeholder="YouTube Embedded URL"
+              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+            />
+            <input
+              type="number"
+              value={newVideoElement.width}
+              onChange={(e) => setNewVideoElement({ ...newVideoElement, width: e.target.value })}
+              placeholder="Width (%)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <input
+              type="number"
+              value={newVideoElement.height}
+              onChange={(e) => setNewVideoElement({ ...newVideoElement, height: e.target.value })}
+              placeholder="Height (%)"
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            />
+            <input
+              type="number"
+              value={newVideoElement.position.x}
+              onChange={(e) =>
+                setNewVideoElement({
+                  ...newVideoElement,
+                  position: { ...newVideoElement.position, x: e.target.value },
+                })
+              }
+              placeholder="Position X (%)"
+              className="border p-2 w-full mb-4 rounded"
+            />
+            <input
+              type="number"
+              value={newVideoElement.position.y}
+              onChange={(e) =>
+                setNewVideoElement({
+                  ...newVideoElement,
+                  position: { ...newVideoElement.position, y: e.target.value },
+                })
+              }
+              placeholder="Position Y (%)"
+              className="border p-2 w-full mb-4 rounded"
+            />
+            <label className="block text-sm font-medium text-gray-700">
+              <input
+                type="checkbox"
+                checked={newVideoElement.autoplay}
+                onChange={(e) => setNewVideoElement({ ...newVideoElement, autoplay: e.target.checked })}
+                className="mr-2"
+              />
+              Auto-play
+            </label>
+            <div className="flex justify-end space-x-2 mt-4">
+              <button onClick={() => setShowAddVideoModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                Cancel
+              </button>
+              <button
+                onClick={newVideoElement.id ? handleAddVideoElement : handleAddVideoElement}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                {newVideoElement.id ? 'Save' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Code modal */}
+      {showAddCodeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center " style={{ zIndex: 1000 }}>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl font-bold mb-4">{isEditingCode ? 'Edit Code Element' : 'Add Code Element'}</h3>
+            <textarea
+              rows="5"
+              value={newCodeElement.code}
+              onChange={(e) => setNewCodeElement({ ...newCodeElement, code: e.target.value })}
+              placeholder="Write your code here"
+              className="border p-2 w-full mb-4 rounded"
+              style={{ whiteSpace: 'pre' }}
+            />
+            <select
+              value={newCodeElement.language}
+              onChange={(e) => setNewCodeElement({ ...newCodeElement, language: e.target.value })}
+              className="border p-2 w-full mb-4 rounded"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="c">C</option>
+            </select>
+            <input
+              type="number"
+              value={newCodeElement.width}
+              onChange={(e) => setNewCodeElement({ ...newCodeElement, width: e.target.value })}
+              placeholder="Width (%)"
+              className="border p-2 w-full mb-4 rounded"
+            />
+            <input
+              type="number"
+              value={newCodeElement.height}
+              onChange={(e) => setNewCodeElement({ ...newCodeElement, height: e.target.value })}
+              placeholder="Height (%)"
+              className="border p-2 w-full mb-4 rounded"
+            />
+            <input
+              type="number"
+              value={newCodeElement.fontSize}
+              onChange={(e) => setNewCodeElement({ ...newCodeElement, fontSize: e.target.value })}
+              placeholder="Font Size (em)"
+              className="border p-2 w-full mb-4 rounded"
+            />
+            {isEditingCode && (
+              <>
+                <input
+                  type="number"
+                  value={newCodeElement.position.x}
+                  onChange={(e) =>
+                    setNewCodeElement({
+                      ...newCodeElement,
+                      position: { ...newCodeElement.position, x: e.target.value },
+                    })
+                  }
+                  placeholder="Position X (%)"
+                  className="border p-2 w-full mb-4 rounded"
+                />
+                <input
+                  type="number"
+                  value={newCodeElement.position.y}
+                  onChange={(e) =>
+                    setNewCodeElement({
+                      ...newCodeElement,
+                      position: { ...newCodeElement.position, y: e.target.value },
+                    })
+                  }
+                  placeholder="Position Y (%)"
+                  className="border p-2 w-full mb-4 rounded"
+                />
+              </>
+            )}
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowAddCodeModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={isEditingCode ? handleUpdateCodeElement : handleAddCodeElement}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+              >
+                {isEditingCode ? 'Save' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   );
