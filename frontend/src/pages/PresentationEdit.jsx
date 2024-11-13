@@ -49,6 +49,146 @@ function PresentationEdit() {
   const [isEditingElement, setIsEditingElement] = useState(false); // is txt editing
   const [editingElementId, setEditingElementId] = useState(null); // add editing elment logic
 
+  // ! Function to handle setting selected element
+  const [selectedElementId, setSelectedElementId] = useState(null);
+
+  // Handle dragging element
+  const handleDragMouseDown = (e, elementId) => {
+    e.stopPropagation();
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (!element) return;
+
+    const slideRef = e.target.closest('.relative');
+    if (!slideRef) return;
+
+    const initialMouseX = e.clientX;
+    const initialMouseY = e.clientY;
+    const initialPosition = { ...element.position };
+
+    const handleMouseMove = (moveEvent) => {
+      let deltaX = (moveEvent.clientX - initialMouseX) / slideRef.clientWidth * 100;
+      let deltaY = (moveEvent.clientY - initialMouseY) / slideRef.clientHeight * 100;
+
+      let newX = Math.max(0, Math.min(100 - element.width, initialPosition.x + deltaX));
+      let newY = Math.max(0, Math.min(100 - element.height, initialPosition.y + deltaY));
+
+      const updatedElements = presentation.slides[currentSlideIndex].elements.map((el) =>
+        el.id === elementId ? { ...el, position: { x: newX, y: newY } } : el
+      );
+      setPresentation({
+        ...presentation,
+        slides: presentation.slides.map((slide, idx) =>
+          idx === currentSlideIndex ? { ...slide, elements: updatedElements } : slide
+        )
+      });
+    };
+
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // Handle resizing element
+  const handleResizeMouseDown = (e, elementId, corner) => {
+    e.stopPropagation();
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (!element) return;
+
+    const slideRef = e.target.closest('.relative');
+    if (!slideRef) return;
+
+    // get slide area's position
+    
+
+    const initialMouseX = e.clientX;
+    const initialMouseY = e.clientY;
+    const initialPosition = { ...element.position };
+    const initialWidth = element.width;
+    const initialHeight = element.height;
+
+    const handleMouseMove = (moveEvent) => {
+
+      // if (moveEvent.clientX > initialMouseX) {
+      //   deltaX = Math.min(moveEvent.clientX - initialMouseX, slideRight - initialMouseX);
+      // } else {
+      //   deltaX = Math.max(moveEvent.clientX - initialMouseX, slideLeft - initialMouseX);
+      // }
+
+      // if (moveEvent.clientY > initialMouseY) {
+      //   deltaY = Math.min(moveEvent.clientY - initialMouseY, slideBottom - initialMouseY);
+      // } else {
+      //   deltaY = Math.max(moveEvent.clientY - initialMouseY, slideTop - initialMouseY);
+      // }
+
+      const slideRect = slideRef.getBoundingClientRect();
+      const slideLeft = slideRect.left; 
+      const slideTop = slideRect.top;
+      const slideRight = slideRect.right;
+      const slideBottom = slideRect.bottom;
+
+      let deltaX = moveEvent.clientX - initialMouseX;
+      let deltaY = moveEvent.clientY - initialMouseY;
+      let newWidth = initialWidth;
+      let newHeight = initialHeight;
+      let newX = initialPosition.x;
+      let newY = initialPosition.y;
+
+      if (corner.includes('right')) {
+        deltaX = Math.min(deltaX, slideRight - initialMouseX);
+        newWidth = Math.min(100, Math.max(1, initialWidth + (deltaX / slideRef.clientWidth) * 100));
+      }
+      if (corner.includes('left')) {
+        deltaX = Math.max(deltaX, slideLeft - initialMouseX);
+        newWidth = Math.min(100, Math.max(1, initialWidth - (deltaX / slideRef.clientWidth) * 100));
+
+        if (newWidth !== initialWidth && newWidth >= 1) {
+          newX = Math.max(0, Math.min(initialPosition.x + (deltaX / slideRef.clientWidth) * 100, initialPosition.x + initialWidth - 1));
+        }
+      }
+      if (corner.includes('bottom')) {
+        deltaY = Math.min(deltaY, slideBottom - initialMouseY);
+        newHeight = Math.min(100, Math.max(1, initialHeight + (deltaY / slideRef.clientHeight) * 100));
+      }
+      if (corner.includes('top')) {
+        deltaY = Math.max(deltaY, slideTop - initialMouseY);
+        newHeight = Math.min(100, Math.max(1, initialHeight - (deltaY / slideRef.clientHeight) * 100));
+
+        if (newHeight !== initialHeight && newHeight >= 1) {
+          newY = Math.max(0, Math.min(initialPosition.y + (deltaY / slideRef.clientHeight) * 100, initialPosition.y + initialHeight - 1));
+        }
+      }
+
+      // Ensure the element stays within the bounds of the slide
+      newX = Math.max(0, Math.min(100 - newWidth, newX));
+      newY = Math.max(0, Math.min(100 - newHeight, newY));
+
+      const updatedElements = presentation.slides[currentSlideIndex].elements.map((el) =>
+        el.id === elementId ? { ...el, position: { x: newX, y: newY }, width: newWidth, height: newHeight } : el
+      );
+      setPresentation({
+        ...presentation,
+        slides: presentation.slides.map((slide, idx) =>
+          idx === currentSlideIndex ? { ...slide, elements: updatedElements } : slide 
+        )
+      });
+    };
+
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+// ! ************************************************************************************************
+
+
+
   const [isEditingVideo, setIsEditingVideo] = useState(false);
   const [editingVideoElementId, setEditingVideoElementId] = useState(null);
 
@@ -119,8 +259,14 @@ function PresentationEdit() {
       setEditingElementId(elementId); // save the id
       setIsEditingElement(true);
       setShowAddTextModal(true); 
+      setNewTextElement({ ...element }); 
+      setEditingElementId(elementId); // save the id
+      setIsEditingElement(true);
+      setShowAddTextModal(true); 
     }
   };
+
+
 
   const handleEditImageElement = (elementId) => {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
@@ -224,7 +370,17 @@ function PresentationEdit() {
     const match = url.match(regex);
     return match ? `https://www.youtube.com/embed/${match[1]}` : url;
   };
-  
+ // Function to reset newTextElement to default values
+ const resetNewTextElement = () => {
+  setNewTextElement({
+    text: '',
+    width: 50,
+    height: 20,
+    fontSize: 1,
+    color: '#000000',
+    position: { x: 0, y: 0 }
+    });
+  };
 //****************************************************** 
 
 
@@ -570,7 +726,7 @@ function PresentationEdit() {
           <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg">
-              <p className="text-lg font-semibold">Slide {presentation.slides[currentSlideIndex].id}</p>
+              
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center">
                 {currentSlideIndex + 1}
@@ -580,6 +736,7 @@ function PresentationEdit() {
               {presentation.slides[currentSlideIndex].elements.map((element) => (
                 <div
                  key={element.id}
+                 onMouseDown={(e) => handleDragMouseDown(e, element.id)}
                  onDoubleClick={() =>
                   element.type === 'text'
                     ? handleEditTextElement(element.id)
@@ -591,6 +748,7 @@ function PresentationEdit() {
                     ? handleEditVideoElement(element.id)
                     : null
                  }
+                 onClick={() => setSelectedElementId(element.id)}
                  onContextMenu={(e) => {
                    e.preventDefault();
                    e.stopPropagation();
@@ -668,6 +826,8 @@ function PresentationEdit() {
                         />
                       </div>
                   ) : element.type === 'code' ? renderCodeElement(element): null} 
+                  {selectedElementId === element.id 
+                  }
                </div>
              ))}
             </div>
@@ -824,7 +984,14 @@ function PresentationEdit() {
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
           style={{ zIndex: 1000 }}
         >
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 1000 }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
+            </h3>
             <h3 className="text-xl font-bold mb-4 text-gray-800">
               {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
             </h3>
@@ -862,7 +1029,7 @@ function PresentationEdit() {
               onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
               className="border p-2 w-full mb-4 rounded focus:outline-none"
             />
-            {isEditingElement && (
+            {/* {isEditingElement && (
               <>
                 <input
                   type="number"
@@ -879,7 +1046,7 @@ function PresentationEdit() {
                   className="border p-2 w-full mb-4 rounded focus:outline-none"
                 />
               </>
-            )}
+            )} */}
             <div className="flex justify-end space-x-2">
               <button 
                 onClick={() => {
@@ -892,7 +1059,14 @@ function PresentationEdit() {
                 Cancel
               </button>
               <button 
-                onClick={isEditingElement ? handleUpdateTextElement : handleAddTextElement}
+                onClick={() => {
+                  if (isEditingElement) {
+                    handleUpdateTextElement();
+                    resetNewTextElement();
+                  } else {
+                    handleAddTextElement();
+                  }
+                }}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 {isEditingElement ? 'Save' : 'Add'}
@@ -1120,6 +1294,7 @@ function PresentationEdit() {
 
 
     </div>
+    
   );
 }
 
