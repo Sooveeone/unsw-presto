@@ -58,6 +58,25 @@ function PresentationEdit() {
     setShowAddImageModal(false);
   };
 
+  // Handle add text elements
+  const handleAddTextElement = () => {
+    const newElement = {
+      id: `element-${Date.now()}`,
+      type: 'image',
+      ...newImageElement,
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1
+    };
+
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: [...slide.elements, newElement] }
+        : slide
+    );
+
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowAddImageModal(false);
+  };
+
   // Handle add text elements ********************************
   const handleAddTextElement = () => {
     const newElement = {
@@ -84,6 +103,14 @@ function PresentationEdit() {
       setEditingElementId(elementId); // save the id
       setIsEditingElement(true);
       setShowAddTextModal(true); 
+    }
+  };
+
+  const handleEditImageElement = (elementId) => {
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (element && element.type === 'image') {
+      setNewImageElement({ ...element });
+      setShowAddImageModal(true);
     }
   };
 
