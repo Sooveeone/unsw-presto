@@ -33,6 +33,46 @@ function PresentationEdit() {
   // ! Function to handle setting selected element
   const [selectedElementId, setSelectedElementId] = useState(null);
 
+  // Handle dragging element
+  const handleDragMouseDown = (e, elementId) => {
+    e.stopPropagation();
+    const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
+    if (!element) return;
+
+    const slideRef = e.target.closest('.relative');
+    if (!slideRef) return;
+
+    const initialMouseX = e.clientX;
+    const initialMouseY = e.clientY;
+    const initialPosition = { ...element.position };
+
+    const handleMouseMove = (moveEvent) => {
+      let deltaX = (moveEvent.clientX - initialMouseX) / slideRef.clientWidth * 100;
+      let deltaY = (moveEvent.clientY - initialMouseY) / slideRef.clientHeight * 100;
+
+      let newX = Math.max(0, Math.min(100 - element.width, initialPosition.x + deltaX));
+      let newY = Math.max(0, Math.min(100 - element.height, initialPosition.y + deltaY));
+
+      const updatedElements = presentation.slides[currentSlideIndex].elements.map((el) =>
+        el.id === elementId ? { ...el, position: { x: newX, y: newY } } : el
+      );
+      setPresentation({
+        ...presentation,
+        slides: presentation.slides.map((slide, idx) =>
+          idx === currentSlideIndex ? { ...slide, elements: updatedElements } : slide
+        )
+      });
+    };
+
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
   // Handle resizing element
   const handleResizeMouseDown = (e, elementId, corner) => {
     e.stopPropagation();
@@ -155,24 +195,7 @@ function PresentationEdit() {
     setShowAddImageModal(false);
   };
 
-  // Handle add text elements
-  // const handleAddTextElement = () => {
-  //   const newElement = {
-  //     id: `element-${Date.now()}`,
-  //     type: 'image',
-  //     ...newImageElement,
-  //     zIndex: presentation.slides[currentSlideIndex].elements.length + 1
-  //   };
 
-  //   const updatedSlides = presentation.slides.map((slide, index) =>
-  //     index === currentSlideIndex
-  //       ? { ...slide, elements: [...slide.elements, newElement] }
-  //       : slide
-  //   );
-
-  //   setPresentation({ ...presentation, slides: updatedSlides });
-  //   setShowAddImageModal(false);
-  // };
 
   // Handle add text elements ********************************
   const handleAddTextElement = () => {
@@ -203,13 +226,7 @@ function PresentationEdit() {
     }
   };
 
-  // const handleEditImageElement = (elementId) => {
-  //   const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
-  //   if (element && element.type === 'image') {
-  //     setNewImageElement({ ...element });
-  //     setShowAddImageModal(true);
-  //   }
-  // };
+
 
   const handleEditImageElement = (elementId) => {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
@@ -509,6 +526,7 @@ function PresentationEdit() {
               {presentation.slides[currentSlideIndex].elements.map((element) => (
                 <div
                   key={element.id}
+                  onMouseDown={(e) => handleDragMouseDown(e, element.id)}
                   onDoubleClick={() => element.type === 'text' ? handleEditTextElement(element.id) : handleEditImageElement(element.id)}
                   onClick={() => setSelectedElementId(element.id)}
                   onContextMenu={(e) => {
