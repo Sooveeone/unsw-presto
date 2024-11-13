@@ -826,8 +826,34 @@ function PresentationEdit() {
                         />
                       </div>
                   ) : element.type === 'code' ? renderCodeElement(element): null} 
-                  {selectedElementId === element.id 
-                  }
+                  {selectedElementId === element.id && (
+                    <>
+                      {/* Top-left handle */}
+                      <div
+                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        style={{ top: '-5px', left: '-5px' }}
+                        onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'top-left')}
+                      />
+                      {/* Top-right handle */}
+                      <div
+                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        style={{ top: '-5px', right: '-5px' }}
+                        onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'top-right')}
+                      />
+                      {/* Bottom-left handle */}
+                      <div
+                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        style={{ bottom: '-5px', left: '-5px' }}
+                        onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'bottom-left')}
+                      />
+                      {/* Bottom-right handle */}
+                      <div
+                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        style={{ bottom: '-5px', right: '-5px' }}
+                        onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'bottom-right')}
+                      />
+                    </>
+                  )}
                </div>
              ))}
             </div>
