@@ -33,7 +33,7 @@ function PresentationEdit() {
     code: '',
     language: 'javascript', 
     width: 50,
-    height: 30,
+    height: 50,
     fontSize: 1,
     position: { x: 0, y: 0 },
   });
@@ -48,6 +48,16 @@ function PresentationEdit() {
 
   const [isEditingElement, setIsEditingElement] = useState(false); // is txt editing
   const [editingElementId, setEditingElementId] = useState(null); // add editing elment logic
+
+
+
+
+
+  const [isEditingVideo, setIsEditingVideo] = useState(false);
+  const [editingVideoElementId, setEditingVideoElementId] = useState(null);
+
+  const [isEditingCode, setIsEditingCode] = useState(false);
+  const [editingCodeElementId, setEditingCodeElementId] = useState(null);
 
   // ! Function to handle setting selected element
   const [selectedElementId, setSelectedElementId] = useState(null);
@@ -112,17 +122,6 @@ function PresentationEdit() {
 
     const handleMouseMove = (moveEvent) => {
 
-      // if (moveEvent.clientX > initialMouseX) {
-      //   deltaX = Math.min(moveEvent.clientX - initialMouseX, slideRight - initialMouseX);
-      // } else {
-      //   deltaX = Math.max(moveEvent.clientX - initialMouseX, slideLeft - initialMouseX);
-      // }
-
-      // if (moveEvent.clientY > initialMouseY) {
-      //   deltaY = Math.min(moveEvent.clientY - initialMouseY, slideBottom - initialMouseY);
-      // } else {
-      //   deltaY = Math.max(moveEvent.clientY - initialMouseY, slideTop - initialMouseY);
-      // }
 
       const slideRect = slideRef.getBoundingClientRect();
       const slideLeft = slideRect.left; 
@@ -187,15 +186,6 @@ function PresentationEdit() {
   };
 // ! ************************************************************************************************
 
-
-
-  const [isEditingVideo, setIsEditingVideo] = useState(false);
-  const [editingVideoElementId, setEditingVideoElementId] = useState(null);
-
-  const [isEditingCode, setIsEditingCode] = useState(false);
-  const [editingCodeElementId, setEditingCodeElementId] = useState(null);
-
-
   const [newImageElement, setNewImageElement] = useState({
     src: '',
     width: 50,
@@ -207,8 +197,8 @@ function PresentationEdit() {
   
   const [newVideoElement, setNewVideoElement] = useState({
     src: '',
-    width: 50,
-    height: 30,
+    width: 100,
+    height: 100,
     autoplay: false,
     position: { x: 0, y: 0 }
   });
@@ -259,14 +249,8 @@ function PresentationEdit() {
       setEditingElementId(elementId); // save the id
       setIsEditingElement(true);
       setShowAddTextModal(true); 
-      setNewTextElement({ ...element }); 
-      setEditingElementId(elementId); // save the id
-      setIsEditingElement(true);
-      setShowAddTextModal(true); 
     }
   };
-
-
 
   const handleEditImageElement = (elementId) => {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
@@ -370,17 +354,19 @@ function PresentationEdit() {
     const match = url.match(regex);
     return match ? `https://www.youtube.com/embed/${match[1]}` : url;
   };
- // Function to reset newTextElement to default values
- const resetNewTextElement = () => {
-  setNewTextElement({
-    text: '',
-    width: 50,
-    height: 20,
-    fontSize: 1,
-    color: '#000000',
-    position: { x: 0, y: 0 }
+  
+  // Function to reset newTextElement to default values
+  const resetNewTextElement = () => {
+    setNewTextElement({
+      text: '',
+      width: 50,
+      height: 20,
+      fontSize: 1,
+      color: '#000000',
+      position: { x: 0, y: 0 }
     });
   };
+
 //****************************************************** 
 
 
@@ -585,16 +571,6 @@ function PresentationEdit() {
   const renderCodeElement = (element) => (
     <pre
       data-id={element.id} 
-      style={{
-        position: 'absolute',
-        top: `${element.position.y}%`,
-        left: `${element.position.x}%`,
-        width: `${element.width}%`,
-        height: `${element.height}%`,
-        fontSize: `${element.fontSize}em`,
-        zIndex: element.zIndex,
-        overflow: 'hidden',
-      }}
       onDoubleClick={() => handleEditCodeElement(element.id)}
     >
       <code className={`language-${element.language}`}>
@@ -642,13 +618,13 @@ function PresentationEdit() {
 
         <HiVideoCamera 
            onClick={() => {
-            setNewVideoElement({
-              src: '',
-              width: 50,
-              height: 30,
-              autoplay: false,
-              position: { x: 0, y: 0 }
-            });
+            // setNewVideoElement({
+            //   src: '',
+            //   width: 50,
+            //   height: 30,
+            //   autoplay: false,
+            //   position: { x: 0, y: 0 }
+            // });
             setShowAddVideoModal(true);
           }}
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
@@ -656,14 +632,14 @@ function PresentationEdit() {
 
         <HiCommandLine
            onClick={() => {
-            setNewCodeElement({
-              code: '',
-              language: 'javascript',
-              width: 50,
-              height: 30,
-              fontSize: 1,
-              position: { x: 0, y: 0 },
-            });
+            // setNewCodeElement({
+            //   code: '',
+            //   language: 'javascript',
+            //   width: 50,
+            //   height: 30,
+            //   fontSize: 1,
+            //   position: { x: 0, y: 0 },
+            // });
             // Reset to add modal mode
             setIsEditingCode(false); 
             setEditingCodeElementId(null); 
@@ -763,7 +739,7 @@ function PresentationEdit() {
                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
                    color: element.color,
                    zIndex: element.zIndex,
-                   border: element.type === 'video' ? '2px dashed blue' : 'none'
+                   border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
                  }}
                  className="overflow-hidden"
                >
@@ -819,13 +795,14 @@ function PresentationEdit() {
                           frameBorder="0"
                           allowFullScreen
                           style={{
-                            pointerEvents: 'none', // Start with non-interactive
-                            objectFit: 'cover', // Ensure proper resizing behavior
+                            pointerEvents: 'none', 
+                            objectFit: 'cover', 
                           }}
                           className="object-cover"
                         />
                       </div>
                   ) : element.type === 'code' ? renderCodeElement(element): null} 
+                  {/* Resizeing below */}
                   {selectedElementId === element.id && (
                     <>
                       {/* Top-left handle */}
@@ -1010,14 +987,7 @@ function PresentationEdit() {
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
           style={{ zIndex: 1000 }}
         >
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
-        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
-              {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
-            </h3>
             <h3 className="text-xl font-bold mb-4 text-gray-800">
               {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
             </h3>
@@ -1302,14 +1272,24 @@ function PresentationEdit() {
             )}
             <div className="flex justify-end space-x-2">
               <button
-                onClick={() => setShowAddCodeModal(false)}
+                
+                onClick={() => {
+                  setShowAddCodeModal(false);
+                  setIsEditingElement(false);
+                  setEditingElementId(null);
+                }}
+               
                 className="px-4 py-2 bg-gray-300 rounded-lg"
+              
               >
                 Cancel
               </button>
               <button
-                onClick={isEditingCode ? handleUpdateCodeElement : handleAddCodeElement}
+                
+                onClick={isEditingCode ? handleUpdateCodeElement : isEditingElement ? handleUpdateTextElement : handleAddCodeElement}
+               
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+              
               >
                 {isEditingCode ? 'Save' : 'Add'}
               </button>
@@ -1320,8 +1300,8 @@ function PresentationEdit() {
 
 
     </div>
-    
   );
 }
 
 export default PresentationEdit;
+
