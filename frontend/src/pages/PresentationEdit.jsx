@@ -1343,18 +1343,49 @@ function PresentationEdit() {
       )}
 
       {showBackgroundModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Set Background</h3>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2000,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2001,
+              backgroundColor: 'white',
+              padding: '1rem',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              width: '24rem',
+              maxWidth: '90%',
+            }}
+          >
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1a202c' }}>
+              Set Background
+            </h3>
 
-            <div className="mb-4">
-              <label className="block font-bold mb-2">Background Type:</label>
+            {/* Background Type Selection */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                Background Type:
+              </label>
               <select
                 value={currentSlideBackground.type || defaultBackground.type}
                 onChange={(e) =>
                   setCurrentSlideBackground({ ...currentSlideBackground, type: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                }}
               >
                 <option value="solid">Solid Color</option>
                 <option value="gradient">Gradient</option>
@@ -1362,69 +1393,155 @@ function PresentationEdit() {
               </select>
             </div>
 
+            {/* Solid Color Picker */}
             {currentSlideBackground.type === 'solid' && (
-              <div className="mb-4">
-                <label className="block font-bold mb-2">Color:</label>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Color:
+                </label>
                 <input
                   type="color"
                   value={currentSlideBackground.value || defaultBackground.value}
                   onChange={(e) =>
                     setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
                   }
-                  className="w-full p-2 border rounded"
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
                 />
               </div>
             )}
 
+            {/* Gradient Color Picker */}
             {currentSlideBackground.type === 'gradient' && (
-              <div className="mb-4">
-                <label className="block font-bold mb-2">Gradient:</label>
-                <input
-                  type="text"
-                  placeholder="e.g., linear-gradient(to right, #ff7e5f, #feb47b)"
-                  value={currentSlideBackground.value || defaultBackground.value}
-                  onChange={(e) =>
-                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
-                  }
-                  className="w-full p-2 border rounded"
-                />
+              <div>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Gradient Colors:
+                </label>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color From:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorFrom || '#ffffff'}
+                      onChange={(e) =>
+                        setCurrentSlideBackground({ ...currentSlideBackground, colorFrom: e.target.value })
+                      }
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color To:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorTo || '#000000'}
+                      onChange={(e) =>
+                        setCurrentSlideBackground({ ...currentSlideBackground, colorTo: e.target.value })
+                      }
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
+            {/* Image URL Input */}
             {currentSlideBackground.type === 'image' && (
-              <div className="mb-4">
-                <label className="block font-bold mb-2">Image URL:</label>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Image URL:
+                </label>
                 <input
                   type="text"
                   placeholder="Enter image URL"
-                  value={currentSlideBackground.value || defaultBackground.value}
+                  value={currentSlideBackground.value || ''}
                   onChange={(e) =>
                     setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
                   }
-                  className="w-full p-2 border rounded"
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
                 />
+                {currentSlideBackground.value && currentSlideBackground.type === 'image' && (
+                  <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                    <img
+                      src={currentSlideBackground.value}
+                      alt="Background Preview"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
+                      onError={() => alert('Invalid image URL. Please check the URL.')}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
-            <div className="flex justify-end space-x-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
               <button
                 onClick={() => setShowBackgroundModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#e2e8f0',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  // Save the background settings for the current slide
                   const updatedSlides = presentation.slides.map((slide, idx) =>
                     idx === currentSlideIndex
-                      ? { ...slide, background: currentSlideBackground }
+                      ? {
+                          ...slide,
+                          background:
+                            currentSlideBackground.type === 'gradient'
+                              ? {
+                                  type: 'gradient',
+                                  value: `linear-gradient(to right, ${
+                                    currentSlideBackground.colorFrom || '#ffffff'
+                                  }, ${currentSlideBackground.colorTo || '#000000'})`,
+                                }
+                              : currentSlideBackground,
+                        }
                       : slide
                   );
                   setPresentation({ ...presentation, slides: updatedSlides });
                   setShowBackgroundModal(false);
                 }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
               >
                 Save
               </button>
