@@ -63,6 +63,21 @@ function PresentationEdit() {
   // ! Function to handle setting selected element
   const [selectedElementId, setSelectedElementId] = useState(null);
 
+  const [defaultBackground, setDefaultBackground] = useState({
+    type: 'solid', 
+    value: '#ffffff', 
+  });
+  
+  const [currentSlideBackground, setCurrentSlideBackground] = useState({
+    type: 'solid', 
+    value: '', 
+  });
+  
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [backgroundError, setBackgroundError] = useState('');
+
+  const [transitionStyle, setTransitionStyle] = useState({});
+
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
     e.preventDefault();
@@ -248,8 +263,8 @@ function PresentationEdit() {
   const newElement = {
     id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
     type: 'text',
-    ...newTextElement,
-    zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
+    ...newTextElement, 
+    zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
   };
 
   const updatedSlides = presentation.slides.map((slide, index) =>
@@ -401,6 +416,44 @@ function PresentationEdit() {
       });
     };
 
+  const handleSetAsDefault = () => {
+    if (!currentSlideBackground.value) {
+      setBackgroundError('Please select a valid background to set as default.');
+      return;
+    }
+  
+    const newDefaultBackground = {
+      ...currentSlideBackground,
+      isDefaultColor: true, // Mark the new default background
+    };
+  
+    // Update slides with the new default background
+    const updatedSlides = presentation.slides.map((slide) => {
+      // If the slide's background is marked as default or matches the previous default, update it
+      if (
+        slide.background?.isDefaultColor || 
+        (!slide.background || // No custom background
+          (slide.background.value === defaultBackground.value &&
+            slide.background.type === defaultBackground.type))
+      ) {
+        return { ...slide, background: newDefaultBackground };
+      }
+  
+      // Retain slides with custom backgrounds
+      return {
+        ...slide,
+        background: {
+          ...slide.background,
+          isDefaultColor: false, // Mark other slides as not default
+        },
+      };
+    });
+  
+    setDefaultBackground(newDefaultBackground);
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowBackgroundModal(false); // Close modal
+  };
+
 //****************************************************** 
 
 
@@ -487,7 +540,12 @@ function PresentationEdit() {
 
   const addSlide = () => {
     if (!presentation) return;
-    const newSlide = { id: `slide-${Date.now()}`, elements: [] };
+    const newSlide = {
+      id: `slide-${Date.now()}`,
+      elements: [],
+      background: { ...defaultBackground, isDefaultColor: true }, 
+    };
+  
     setPresentation({
       ...presentation,
       slides: [...presentation.slides, newSlide],
@@ -513,13 +571,39 @@ function PresentationEdit() {
 
   const navigateToNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(-10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex + 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
-
+  
   const navigateToPreviousSlide = () => {
     if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex - 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
 
@@ -618,6 +702,14 @@ function PresentationEdit() {
       setTimeout(() => hljs.highlightAll(), 0);
     }
   }, [presentation]);
+
+  useEffect(() => {
+    if (!currentSlideBackground.value) {
+      setCurrentSlideBackground({ ...defaultBackground });
+    }
+  }, [showBackgroundModal]);
+  
+  
 
   if (!presentation) {
     return <div>Loading.....</div>;
@@ -735,7 +827,28 @@ function PresentationEdit() {
           {/* Slide area refine later for shadow*/}
           <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
             {/* show slides */}
-            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
+                style={{
+                  ...transitionStyle,
+                  background:
+                    presentation.slides[currentSlideIndex].background?.type === 'image'
+                      ? `url(${presentation.slides[currentSlideIndex].background.value})`
+                      : presentation.slides[currentSlideIndex].background?.type === 'gradient'
+                      ? presentation.slides[currentSlideIndex].background.value
+                      : presentation.slides[currentSlideIndex].background?.value || 
+                        (defaultBackground.type === 'image'
+                          ? `url(${defaultBackground.value})`
+                          : defaultBackground.type === 'gradient'
+                          ? defaultBackground.value
+                          : defaultBackground.value),
+                  backgroundSize:
+                    presentation.slides[currentSlideIndex].background?.type === 'image' ||
+                    defaultBackground.type === 'image'
+                      ? 'cover'
+                      : 'initial',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }}>
               
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center"
@@ -773,6 +886,7 @@ function PresentationEdit() {
                    width: `${element.width}%`,
                    height: `${element.height}%`,
                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
+                   fontFamily: element.type === 'text' ? element.fontFamily : 'initial',
                    color: element.color,
                    zIndex: element.zIndex,
                    border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
@@ -904,6 +1018,13 @@ function PresentationEdit() {
               className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </div>
+
+          <button
+            onClick={() => setShowBackgroundModal(true)}
+            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
+          >
+            Set Background
+          </button>
           
           {/* Previous and Next Slide Buttons */}
           <div className="flex flex-row items-center space-x-4">
@@ -1053,7 +1174,37 @@ function PresentationEdit() {
               onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
               className="border p-2 w-full mb-4 rounded focus:outline-none"
             />
-
+            <select
+              value={newTextElement.fontFamily}
+              onChange={(e) => setNewTextElement({ ...newTextElement, fontFamily: e.target.value })}
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            >
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Arial">Arial</option>
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+            {/* {isEditingElement && (
+              <>
+                <input
+                  type="number"
+                  value={newTextElement.position?.x}
+                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, x: e.target.value } })}
+                  placeholder="Position X (%)"
+                  className="border p-2 w-full mb-4 rounded focus:outline-none"
+                />
+                <input
+                  type="number"
+                  value={newTextElement.position?.y}
+                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, y: e.target.value } })}
+                  placeholder="Position Y (%)"
+                  className="border p-2 w-full mb-4 rounded focus:outline-none"
+                />
+              </>
+            )} */}
             <div className="flex justify-end space-x-2">
               <button 
                 onClick={() => {
@@ -1237,6 +1388,257 @@ function PresentationEdit() {
           </div>
         </div>
       )}
+
+      {showBackgroundModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2000,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2001,
+              backgroundColor: 'white',
+              padding: '1rem',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              width: '24rem',
+              maxWidth: '90%',
+            }}
+          >
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1a202c' }}>
+              Set Background
+            </h3>
+
+            {/* Background Type Selection */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                Background Type:
+              </label>
+              <select
+                value={currentSlideBackground.type || defaultBackground.type}
+                onChange={(e) =>
+                  setCurrentSlideBackground({ ...currentSlideBackground, type: e.target.value })
+                }
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                }}
+              >
+                <option value="solid">Solid Color</option>
+                <option value="gradient">Gradient</option>
+                <option value="image">Image</option>
+              </select>
+            </div>
+
+            {/* Solid Color Picker */}
+            {currentSlideBackground.type === 'solid' && (
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Color:
+                </label>
+                <input
+                  type="color"
+                  value={currentSlideBackground.value || defaultBackground.value}
+                  onChange={(e) =>
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                  }
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Gradient Color Picker */}
+            {currentSlideBackground.type === 'gradient' && (
+              <div>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Gradient Colors:
+                </label>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color From:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorFrom || '#ffffff'}
+                      onChange={(e) => {
+                        const newColorFrom = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorFrom: newColorFrom,
+                            value: `linear-gradient(to right, ${newColorFrom}, ${prev.colorTo || '#000000'})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color To:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorTo || '#000000'}
+                      onChange={(e) => {
+                        const newColorTo = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorTo: newColorTo,
+                            value: `linear-gradient(to right, ${prev.colorFrom || '#ffffff'}, ${newColorTo})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Image URL Input */}
+            {currentSlideBackground.type === 'image' && (
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Image URL:
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter image URL"
+                  value={currentSlideBackground.value || ''}
+                  onChange={(e) => {
+                    setBackgroundError(''); // Reset error on input change
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
+                />
+                {backgroundError && (
+                  <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                    {backgroundError}
+                  </div>
+                )}
+                {currentSlideBackground.value && (
+                  <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                    <img
+                      src={currentSlideBackground.value}
+                      alt="Background Preview"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
+                      onError={() => setBackgroundError('Invalid image URL. Please check the URL.')}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                onClick={handleSetAsDefault}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              >
+                Set as Default
+              </button>
+              <button
+                onClick={() => {
+                  setShowBackgroundModal(false);
+                  setBackgroundError(''); // Reset error when modal closes
+                }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#e2e8f0',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setBackgroundError('');
+                  if (currentSlideBackground.type === 'image') {
+                    if (!currentSlideBackground.value) {
+                      setBackgroundError('Image URL cannot be empty. Please enter a valid URL.');
+                      return;
+                    }
+                    const image = new Image();
+                    image.onload = () => {
+                      const updatedSlides = presentation.slides.map((slide, idx) =>
+                        idx === currentSlideIndex
+                          ? { ...slide, background: currentSlideBackground }
+                          : slide
+                      );
+                      setPresentation({ ...presentation, slides: updatedSlides });
+                      setShowBackgroundModal(false);
+                    };
+                    image.onerror = () => {
+                      setBackgroundError('Invalid image URL. Please check the URL.');
+                    };
+                    image.src = currentSlideBackground.value; // Trigger the image validation
+                  } else {
+                    const updatedSlides = presentation.slides.map((slide, idx) =>
+                      idx === currentSlideIndex
+                        ? { ...slide, background: currentSlideBackground }
+                        : slide
+                    );
+                    setPresentation({ ...presentation, slides: updatedSlides });
+                    setShowBackgroundModal(false);
+                  }
+                }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
     </div>
