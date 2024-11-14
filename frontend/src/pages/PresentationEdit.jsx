@@ -1476,7 +1476,68 @@ function PresentationEdit() {
               </div>
             )}
 
-            
+            {/* Gradient Color Picker */}
+            {currentSlideBackground.type === 'gradient' && (
+              <div>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Gradient Colors:
+                </label>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color From:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorFrom || '#ffffff'}
+                      onChange={(e) => {
+                        const newColorFrom = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorFrom: newColorFrom,
+                            value: `linear-gradient(to right, ${newColorFrom}, ${prev.colorTo || '#000000'})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                      Color To:
+                    </label>
+                    <input
+                      type="color"
+                      value={currentSlideBackground.colorTo || '#000000'}
+                      onChange={(e) => {
+                        const newColorTo = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorTo: newColorTo,
+                            value: `linear-gradient(to right, ${prev.colorFrom || '#ffffff'}, ${newColorTo})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Image URL Input */}
             {currentSlideBackground.type === 'image' && (
