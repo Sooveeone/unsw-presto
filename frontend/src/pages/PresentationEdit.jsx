@@ -77,6 +77,21 @@ function PresentationEdit() {
 
   // TODO: ..............................................................
 
+  const [defaultBackground, setDefaultBackground] = useState({
+    type: 'solid', 
+    value: '#ffffff', 
+  });
+  
+  const [currentSlideBackground, setCurrentSlideBackground] = useState({
+    type: 'solid', 
+    value: '', 
+  });
+  
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [backgroundError, setBackgroundError] = useState('');
+
+  const [transitionStyle, setTransitionStyle] = useState({});
+
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
     e.preventDefault();
@@ -262,8 +277,8 @@ function PresentationEdit() {
   const newElement = {
     id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
     type: 'text',
-    ...newTextElement,
-    zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
+    ...newTextElement, 
+    zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
   };
 
   const updatedSlides = presentation.slides.map((slide, index) =>
@@ -404,6 +419,8 @@ function PresentationEdit() {
     });
   };
 
+
+
     // Function to reset newTextElement to default values
     const resetNewImageElement = () => {
       setNewImageElement({
@@ -414,6 +431,44 @@ function PresentationEdit() {
         position: { x: 0, y: 0 }
       });
     };
+
+  const handleSetAsDefault = () => {
+    if (!currentSlideBackground.value) {
+      setBackgroundError('Please select a valid background to set as default.');
+      return;
+    }
+  
+    const newDefaultBackground = {
+      ...currentSlideBackground,
+      isDefaultColor: true, // Mark the new default background
+    };
+  
+    // Update slides with the new default background
+    const updatedSlides = presentation.slides.map((slide) => {
+      // If the slide's background is marked as default or matches the previous default, update it
+      if (
+        slide.background?.isDefaultColor || 
+        (!slide.background || // No custom background
+          (slide.background.value === defaultBackground.value &&
+            slide.background.type === defaultBackground.type))
+      ) {
+        return { ...slide, background: newDefaultBackground };
+      }
+  
+      // Retain slides with custom backgrounds
+      return {
+        ...slide,
+        background: {
+          ...slide.background,
+          isDefaultColor: false, // Mark other slides as not default
+        },
+      };
+    });
+  
+    setDefaultBackground(newDefaultBackground);
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowBackgroundModal(false); // Close modal
+  };
 
 //****************************************************** 
 
@@ -501,7 +556,12 @@ function PresentationEdit() {
 
   const addSlide = () => {
     if (!presentation) return;
-    const newSlide = { id: `slide-${Date.now()}`, elements: [] };
+    const newSlide = {
+      id: `slide-${Date.now()}`,
+      elements: [],
+      background: { ...defaultBackground, isDefaultColor: true }, 
+    };
+  
     setPresentation({
       ...presentation,
       slides: [...presentation.slides, newSlide],
@@ -528,13 +588,39 @@ function PresentationEdit() {
 
   const navigateToNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(-10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex + 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
-
+  
   const navigateToPreviousSlide = () => {
     if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex - 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
 
@@ -633,6 +719,14 @@ function PresentationEdit() {
       setTimeout(() => hljs.highlightAll(), 0);
     }
   }, [presentation]);
+
+  useEffect(() => {
+    if (!currentSlideBackground.value) {
+      setCurrentSlideBackground({ ...defaultBackground });
+    }
+  }, [showBackgroundModal]);
+  
+  
 
   if (!presentation) {
     return <div>Loading.....</div>;
@@ -747,7 +841,28 @@ function PresentationEdit() {
           {/* Slide area refine later for shadow*/}
           <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
             {/* show slides */}
-            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
+                style={{
+                  ...transitionStyle,
+                  background:
+                    presentation.slides[currentSlideIndex].background?.type === 'image'
+                      ? `url(${presentation.slides[currentSlideIndex].background.value})`
+                      : presentation.slides[currentSlideIndex].background?.type === 'gradient'
+                      ? presentation.slides[currentSlideIndex].background.value
+                      : presentation.slides[currentSlideIndex].background?.value || 
+                        (defaultBackground.type === 'image'
+                          ? `url(${defaultBackground.value})`
+                          : defaultBackground.type === 'gradient'
+                          ? defaultBackground.value
+                          : defaultBackground.value),
+                  backgroundSize:
+                    presentation.slides[currentSlideIndex].background?.type === 'image' ||
+                    defaultBackground.type === 'image'
+                      ? 'cover'
+                      : 'initial',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }}>
               
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center"
@@ -785,6 +900,7 @@ function PresentationEdit() {
                    width: `${element.width}%`,
                    height: `${element.height}%`,
                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
+                   fontFamily: element.type === 'text' ? element.fontFamily : 'initial',
                    color: element.color,
                    zIndex: element.zIndex,
                    border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
@@ -916,6 +1032,13 @@ function PresentationEdit() {
               className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </div>
+
+          <button
+            onClick={() => setShowBackgroundModal(true)}
+            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
+          >
+            Set Background
+          </button>
           
           {/* Previous and Next Slide Buttons */}
           <div className="flex flex-row items-center space-x-4">
@@ -1065,7 +1188,37 @@ function PresentationEdit() {
               onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
               className="border p-2 w-full mb-4 rounded focus:outline-none"
             />
-
+            <select
+              value={newTextElement.fontFamily}
+              onChange={(e) => setNewTextElement({ ...newTextElement, fontFamily: e.target.value })}
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            >
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Arial">Arial</option>
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+            {/* {isEditingElement && (
+              <>
+                <input
+                  type="number"
+                  value={newTextElement.position?.x}
+                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, x: e.target.value } })}
+                  placeholder="Position X (%)"
+                  className="border p-2 w-full mb-4 rounded focus:outline-none"
+                />
+                <input
+                  type="number"
+                  value={newTextElement.position?.y}
+                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, y: e.target.value } })}
+                  placeholder="Position Y (%)"
+                  className="border p-2 w-full mb-4 rounded focus:outline-none"
+                />
+              </>
+            )} */}
             <div className="flex justify-end space-x-2">
               <button 
                 onClick={() => {
@@ -1249,6 +1402,9 @@ function PresentationEdit() {
           </div>
         </div>
       )}
+
+      
+
 
     </div>
     </div>
