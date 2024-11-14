@@ -206,21 +206,40 @@ function PresentationEdit() {
   });
 
   const handleAddImageElement = () => {
-    const newElement = {
-      id: `element-${Date.now()}`,
-      type: 'image',
-      ...newImageElement,
-      zIndex: presentation.slides[currentSlideIndex].elements.length + 1
-    };
+    if (isEditingImage && editingImageElementId) {
+      // eddit logic
+      const updatedSlides = presentation.slides.map((slide, index) =>
+        index === currentSlideIndex
+          ? {
+              ...slide,
+              elements: slide.elements.map(el =>
+                el.id === editingImageElementId ? { ...el, ...newImageElement } : el
+              ),
+            }
+          : slide
+      );
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+    } else {
 
-    const updatedSlides = presentation.slides.map((slide, index) =>
-      index === currentSlideIndex
-        ? { ...slide, elements: [...slide.elements, newElement] }
-        : slide
-    );
-
-    setPresentation({ ...presentation, slides: updatedSlides });
+      const newElement = {
+        id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        type: 'image',
+        ...newImageElement,
+        zIndex: presentation.slides[currentSlideIndex].elements.length + 1
+      };
+  
+      const updatedSlides = presentation.slides.map((slide, index) =>
+        index === currentSlideIndex
+          ? { ...slide, elements: [...slide.elements, newElement] }
+          : slide
+      );
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+    }
     setShowAddImageModal(false);
+    setIsEditingImage(false);
+    setEditingImageElementId(null);
   };
 
   // Handle add text elements
@@ -258,6 +277,8 @@ function PresentationEdit() {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
     if (element && element.type === 'image') {
       setNewImageElement({ ...element });
+      setIsEditingImage(true);
+      setEditingImageElementId(elementId);
       setShowAddImageModal(true);
     }
   };
@@ -368,6 +389,17 @@ function PresentationEdit() {
       position: { x: 0, y: 0 }
     });
   };
+
+    // Function to reset newTextElement to default values
+    const resetNewImageElement = () => {
+      setNewImageElement({
+        src: '',
+        width: 50,
+        height: 30,
+        alt: '',
+        position: { x: 0, y: 0 }
+      });
+    };
 
 //****************************************************** 
 
@@ -902,7 +934,7 @@ function PresentationEdit() {
 
       </div>
       
-
+      <div className="relative">
       {/* Error Modal for Last Slide Deletion */}
       {showErrorModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
@@ -993,7 +1025,7 @@ function PresentationEdit() {
 
       {showAddTextModal && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
           style={{ zIndex: 1000 }}
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
@@ -1007,20 +1039,7 @@ function PresentationEdit() {
               placeholder="Text Content"
               className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
             />
-            {/* <input
-              type="number"
-              value={newTextElement.width}
-              onChange={(e) => setNewTextElement({ ...newTextElement, width: e.target.value })}
-              placeholder="Width (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="number"
-              value={newTextElement.height}
-              onChange={(e) => setNewTextElement({ ...newTextElement, height: e.target.value })}
-              placeholder="Height (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            /> */}
+          
             <input
               type="number"
               value={newTextElement.fontSize}
@@ -1034,24 +1053,7 @@ function PresentationEdit() {
               onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
               className="border p-2 w-full mb-4 rounded focus:outline-none"
             />
-            {/* {isEditingElement && (
-              <>
-                <input
-                  type="number"
-                  value={newTextElement.position?.x}
-                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, x: e.target.value } })}
-                  placeholder="Position X (%)"
-                  className="border p-2 w-full mb-4 rounded focus:outline-none"
-                />
-                <input
-                  type="number"
-                  value={newTextElement.position?.y}
-                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, y: e.target.value } })}
-                  placeholder="Position Y (%)"
-                  className="border p-2 w-full mb-4 rounded focus:outline-none"
-                />
-              </>
-            )} */}
+
             <div className="flex justify-end space-x-2">
               <button 
                 onClick={() => {
@@ -1083,11 +1085,13 @@ function PresentationEdit() {
       
       {showAddImageModal && (
         <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
         style={{ zIndex: 1000 }} 
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Image Element</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              {isEditingImage ? 'Edit Image' : 'Add Image'}
+            </h3>
             <input
               type="text"
               value={newImageElement.src}
@@ -1108,11 +1112,29 @@ function PresentationEdit() {
               className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
             />
             <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowAddImageModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+              <button onClick={() => {
+                setShowAddImageModal(false)
+                setIsEditingImage(false);
+                setEditingImageElementId(null);
+                resetNewImageElement();
+              }} 
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              >
                 Cancel
               </button>
-              <button onClick={handleAddImageElement} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Save
+              
+              <button 
+                onClick={() => {
+                  if (isEditingImage) {
+                    handleAddImageElement();
+                    resetNewImageElement();
+                  } else {
+                    handleAddImageElement();
+                  }
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                {isEditingImage ? 'Save' : 'Add'}
               </button>
             </div>
           </div>
@@ -1216,7 +1238,7 @@ function PresentationEdit() {
         </div>
       )}
 
-
+    </div>
     </div>
   );
 }
