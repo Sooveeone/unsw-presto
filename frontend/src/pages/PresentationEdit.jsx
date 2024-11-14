@@ -73,6 +73,7 @@ function PresentationEdit() {
   });
   
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [backgroundError, setBackgroundError] = useState(''); // State for error message
 
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
@@ -596,6 +597,7 @@ function PresentationEdit() {
       setTimeout(() => hljs.highlightAll(), 0);
     }
   }, [presentation]);
+  
 
   if (!presentation) {
     return <div>Loading.....</div>;
@@ -1436,9 +1438,17 @@ function PresentationEdit() {
                     <input
                       type="color"
                       value={currentSlideBackground.colorFrom || '#ffffff'}
-                      onChange={(e) =>
-                        setCurrentSlideBackground({ ...currentSlideBackground, colorFrom: e.target.value })
-                      }
+                      onChange={(e) => {
+                        const newColorFrom = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorFrom: newColorFrom,
+                            value: `linear-gradient(to right, ${newColorFrom}, ${prev.colorTo || '#000000'})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
                       style={{
                         width: '100%',
                         padding: '0.5rem',
@@ -1454,9 +1464,17 @@ function PresentationEdit() {
                     <input
                       type="color"
                       value={currentSlideBackground.colorTo || '#000000'}
-                      onChange={(e) =>
-                        setCurrentSlideBackground({ ...currentSlideBackground, colorTo: e.target.value })
-                      }
+                      onChange={(e) => {
+                        const newColorTo = e.target.value;
+                        setCurrentSlideBackground((prev) => {
+                          const updatedBackground = {
+                            ...prev,
+                            colorTo: newColorTo,
+                            value: `linear-gradient(to right, ${prev.colorFrom || '#ffffff'}, ${newColorTo})`,
+                          };
+                          return updatedBackground;
+                        });
+                      }}
                       style={{
                         width: '100%',
                         padding: '0.5rem',
@@ -1479,9 +1497,10 @@ function PresentationEdit() {
                   type="text"
                   placeholder="Enter image URL"
                   value={currentSlideBackground.value || ''}
-                  onChange={(e) =>
-                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setBackgroundError(''); // Reset error on input change
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
+                  }}
                   style={{
                     width: '100%',
                     padding: '0.5rem',
@@ -1489,7 +1508,12 @@ function PresentationEdit() {
                     borderRadius: '4px',
                   }}
                 />
-                {currentSlideBackground.value && currentSlideBackground.type === 'image' && (
+                {backgroundError && (
+                  <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                    {backgroundError}
+                  </div>
+                )}
+                {currentSlideBackground.value && (
                   <div style={{ marginTop: '1rem', textAlign: 'center' }}>
                     <img
                       src={currentSlideBackground.value}
@@ -1500,7 +1524,7 @@ function PresentationEdit() {
                         borderRadius: '4px',
                         border: '1px solid #ccc',
                       }}
-                      onError={() => alert('Invalid image URL. Please check the URL.')}
+                      onError={() => setBackgroundError('Invalid image URL. Please check the URL.')}
                     />
                   </div>
                 )}
@@ -1509,7 +1533,20 @@ function PresentationEdit() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
               <button
-                onClick={() => setShowBackgroundModal(false)}
+                onClick={() => {
+                  setDefaultBackground(currentSlideBackground);
+                  setShowBackgroundModal(false);
+                }
+                }
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              >
+                Set as Default
+              </button>
+              <button
+                onClick={() => {
+                  setShowBackgroundModal(false);
+                  setBackgroundError(''); // Reset error when modal closes
+                }}
                 style={{
                   padding: '0.5rem 1rem',
                   backgroundColor: '#e2e8f0',
@@ -1522,24 +1559,35 @@ function PresentationEdit() {
               </button>
               <button
                 onClick={() => {
-                  const updatedSlides = presentation.slides.map((slide, idx) =>
-                    idx === currentSlideIndex
-                      ? {
-                          ...slide,
-                          background:
-                            currentSlideBackground.type === 'gradient'
-                              ? {
-                                  type: 'gradient',
-                                  value: `linear-gradient(to right, ${
-                                    currentSlideBackground.colorFrom || '#ffffff'
-                                  }, ${currentSlideBackground.colorTo || '#000000'})`,
-                                }
-                              : currentSlideBackground,
-                        }
-                      : slide
-                  );
-                  setPresentation({ ...presentation, slides: updatedSlides });
-                  setShowBackgroundModal(false);
+                  setBackgroundError('');
+                  if (currentSlideBackground.type === 'image') {
+                    if (!currentSlideBackground.value) {
+                      setBackgroundError('Image URL cannot be empty. Please enter a valid URL.');
+                      return;
+                    }
+                    const image = new Image();
+                    image.onload = () => {
+                      const updatedSlides = presentation.slides.map((slide, idx) =>
+                        idx === currentSlideIndex
+                          ? { ...slide, background: currentSlideBackground }
+                          : slide
+                      );
+                      setPresentation({ ...presentation, slides: updatedSlides });
+                      setShowBackgroundModal(false);
+                    };
+                    image.onerror = () => {
+                      setBackgroundError('Invalid image URL. Please check the URL.');
+                    };
+                    image.src = currentSlideBackground.value; // Trigger the image validation
+                  } else {
+                    const updatedSlides = presentation.slides.map((slide, idx) =>
+                      idx === currentSlideIndex
+                        ? { ...slide, background: currentSlideBackground }
+                        : slide
+                    );
+                    setPresentation({ ...presentation, slides: updatedSlides });
+                    setShowBackgroundModal(false);
+                  }
                 }}
                 style={{
                   padding: '0.5rem 1rem',
