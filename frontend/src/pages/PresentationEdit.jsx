@@ -506,6 +506,7 @@ function PresentationEdit() {
       ...presentation,
       slides: [...presentation.slides, newSlide],
     });
+    setCurrentSlideIndex(presentation.slides.length);
   };
 
   const deleteSlide = (slideId) => {

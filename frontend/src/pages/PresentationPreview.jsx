@@ -35,6 +35,18 @@ function PresentationPreview() {
     navigate(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, { replace: true });
   }, [currentSlideIndex, presentationId, navigate]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowLeft') navigateToPreviousSlide();
+      if (event.key === 'ArrowRight') navigateToNextSlide();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentSlideIndex, presentation]);
+
+
   const navigateToNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
       setCurrentSlideIndex(currentSlideIndex + 1);
@@ -52,9 +64,9 @@ function PresentationPreview() {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-950 text-white">
       {/* Slide area */}
-      <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
+      <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
         {/* Render elements */}
         {presentation.slides[currentSlideIndex].elements.map((element) => (
           <div
@@ -95,30 +107,32 @@ function PresentationPreview() {
       </div>
 
       {/* Slide navigation */}
-      <div className="flex flex-row items-center justify-between mt-4 w-full max-w-5xl">
-        {/* Previous Slide Button */}
-        <HiChevronLeft
-          onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
-          className={`w-12 h-12 cursor-pointer transition-transform duration-200 ${
-            currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-white hover:scale-110"
-          }`}
-        />
-
-        {/* Slide Index */}
-        <div className="text-lg">
-          Slide {currentSlideIndex + 1} of {presentation.slides.length}
-        </div>
-
-        {/* Next Slide Button */}
-        <HiChevronRight
-          onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
-          className={`w-12 h-12 cursor-pointer transition-transform duration-200 ${
-            currentSlideIndex === presentation.slides.length - 1
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-white hover:scale-110"
-          }`}
-        />
-      </div>
+  <div className="absolute bottom-4 left-4 text-2xl bg-black bg-opacity-80 rounded-lg p-2"
+    style={{ zIndex: 1000 }}
+  >
+    {currentSlideIndex + 1} of {presentation.slides.length}
+  </div>
+ {/* Navigation buttons container in the right bottom */}
+ <div className="absolute bottom-4 right-4 flex items-center space-x-4 bg-black bg-opacity-80 p-3 rounded-lg"
+    style={{ zIndex: 1000 }}
+ >
+    {/* Previous Slide Button */}
+    <HiChevronLeft
+      onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
+      className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
+        currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-white hover:scale-125"
+      }`}
+    />
+    {/* Next Slide Button */}
+    <HiChevronRight
+      onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
+      className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
+        currentSlideIndex === presentation.slides.length - 1
+          ? "text-gray-400 cursor-not-allowed"
+          : "text-white hover:scale-125"
+      }`}
+    />
+  </div>
     </div>
   );
 }
