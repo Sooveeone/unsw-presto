@@ -7,6 +7,7 @@
 - 27/10/2024 - fix pre-commit hook and gitlab CI to ignore dependencies updates
 - 07/11/2024 - fix wrong expression of position in 2.3.6
 - 10/11/2024 - remove squashing commit for merge requests to master & fix description of presentation & 2.3.6 resize
+- 12/11/2024 - fix: clarification & soften requirement on font-family
 
 ## Due date
 
@@ -214,7 +215,13 @@ Note: You can wrap a container out of `<video />` element to allow user editting
 
 #### 2.4.1. Font adjustment
 
-- For all text boxes on the slide, on the slideshow edit screen, the user should be able to change the global `font-family` of them, the user should be able to choose from at least 3 different font-famlies.
+- For all text boxes on the slide, on the slideshow edit screen, the user should be able to change the `font-family` of them, the user should be able to choose from at least 3 different font-famlies.
+
+You are free to implement it as:
+
+A. Each text box has its own font-family property
+B. Font-family as a per presentation level setting for the one user is editing
+C. Font-family as a per slide level setting for the one user is on
 
 #### 2.4.2. Theme and background picker
 
