@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
-import { HiHome, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
+import { HiHome, HiEye, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
 import { AiFillEdit, AiFillFileImage } from "react-icons/ai";
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
@@ -640,6 +640,14 @@ function PresentationEdit() {
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
         />
 
+        <HiEye
+          onClick={async () => {
+            await saveUpdatedThumbnail();
+            window.open(`/preview/${presentationId}/slide/${currentSlideIndex}`, '_blank');
+          }}
+          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
+        />
+
         <HiPencil
           onClick={() => setShowAddTextModal(true)}
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
@@ -652,13 +660,7 @@ function PresentationEdit() {
 
         <HiVideoCamera 
            onClick={() => {
-            // setNewVideoElement({
-            //   src: '',
-            //   width: 50,
-            //   height: 30,
-            //   autoplay: false,
-            //   position: { x: 0, y: 0 }
-            // });
+            
             setShowAddVideoModal(true);
           }}
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
@@ -666,14 +668,7 @@ function PresentationEdit() {
 
         <HiCommandLine
            onClick={() => {
-            // setNewCodeElement({
-            //   code: '',
-            //   language: 'javascript',
-            //   width: 50,
-            //   height: 30,
-            //   fontSize: 1,
-            //   position: { x: 0, y: 0 },
-            // });
+            
             // Reset to add modal mode
             setIsEditingCode(false); 
             setEditingCodeElementId(null); 
@@ -684,7 +679,7 @@ function PresentationEdit() {
         
         <HiTrash  
           onClick={() => setShowDeleteModal(true)} 
-          className="text-primaryBlue w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+          className="text-black w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
         />
 
       </div>
@@ -875,12 +870,7 @@ function PresentationEdit() {
 
           {/* Slideshow Deck Sidebar */}
           <div className="w-1/8 flex flex-col">
-            {/* <button
-              onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
-              className="px-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-            >
-              Delete Slide
-            </button> */}
+            
             <HiTrash  
               onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
               className="text-red-500 w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
@@ -890,15 +880,20 @@ function PresentationEdit() {
         </div>
         
         {/* Control Panel */}
-        <div className="flex flex-row items-center justify-between  p-1 rounded-lg shadow-md">
+        <div className="flex flex-row items-center justify-between  p-1 rounded-lg shadow-md space-x-2">
+
+
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="max-w-32 md:w-1/4 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200"
+          >
+            Delete Presentation
+          </button>
+
           {/* Add Slide 按钮 */}
+
           <div className="flex-1 flex justify-center">
-            {/* <button
-              onClick={addSlide}
-              className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-green-600"
-            >
-              Add Slide
-            </button> */}
+      
             <HiPlusCircle 
               onClick={addSlide}
               className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
