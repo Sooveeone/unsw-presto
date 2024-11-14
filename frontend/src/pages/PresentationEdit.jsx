@@ -50,7 +50,8 @@ function PresentationEdit() {
   const [editingElementId, setEditingElementId] = useState(null); // add editing elment logic
 
 
-
+  const [isEditingImage, setIsEditingImage] = useState(false);
+  const [editingImageElementId, setEditingImageElementId] = useState(null);
 
 
   const [isEditingVideo, setIsEditingVideo] = useState(false);
@@ -77,6 +78,7 @@ function PresentationEdit() {
 
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
+    e.preventDefault();
     e.stopPropagation();
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
     if (!element) return;
@@ -210,28 +212,47 @@ function PresentationEdit() {
   
   const [newVideoElement, setNewVideoElement] = useState({
     src: '',
-    width: 100,
-    height: 100,
+    width: 50,
+    height: 50,
     autoplay: false,
     position: { x: 0, y: 0 }
   });
 
   const handleAddImageElement = () => {
-    const newElement = {
-      id: `element-${Date.now()}`,
-      type: 'image',
-      ...newImageElement,
-      zIndex: presentation.slides[currentSlideIndex].elements.length + 1
-    };
+    if (isEditingImage && editingImageElementId) {
+      // eddit logic
+      const updatedSlides = presentation.slides.map((slide, index) =>
+        index === currentSlideIndex
+          ? {
+              ...slide,
+              elements: slide.elements.map(el =>
+                el.id === editingImageElementId ? { ...el, ...newImageElement } : el
+              ),
+            }
+          : slide
+      );
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+    } else {
 
-    const updatedSlides = presentation.slides.map((slide, index) =>
-      index === currentSlideIndex
-        ? { ...slide, elements: [...slide.elements, newElement] }
-        : slide
-    );
-
-    setPresentation({ ...presentation, slides: updatedSlides });
+      const newElement = {
+        id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        type: 'image',
+        ...newImageElement,
+        zIndex: presentation.slides[currentSlideIndex].elements.length + 1
+      };
+  
+      const updatedSlides = presentation.slides.map((slide, index) =>
+        index === currentSlideIndex
+          ? { ...slide, elements: [...slide.elements, newElement] }
+          : slide
+      );
+  
+      setPresentation({ ...presentation, slides: updatedSlides });
+    }
     setShowAddImageModal(false);
+    setIsEditingImage(false);
+    setEditingImageElementId(null);
   };
 
   // Handle add text elements
@@ -269,6 +290,8 @@ function PresentationEdit() {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
     if (element && element.type === 'image') {
       setNewImageElement({ ...element });
+      setIsEditingImage(true);
+      setEditingImageElementId(elementId);
       setShowAddImageModal(true);
     }
   };
@@ -379,6 +402,17 @@ function PresentationEdit() {
       position: { x: 0, y: 0 }
     });
   };
+
+    // Function to reset newTextElement to default values
+    const resetNewImageElement = () => {
+      setNewImageElement({
+        src: '',
+        width: 50,
+        height: 30,
+        alt: '',
+        position: { x: 0, y: 0 }
+      });
+    };
 
   const handleSetAsDefault = () => {
     if (!currentSlideBackground.value) {
@@ -788,7 +822,9 @@ function PresentationEdit() {
                 }}>
               
               {/* Slide Index */}
-              <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center">
+              <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center"
+                style={{ zIndex: 1000 }}
+              >
                 {currentSlideIndex + 1}
               </div>
 
@@ -846,6 +882,7 @@ function PresentationEdit() {
                         }}
                         onClick={(e) => {
                           // Enable interactivity on single click
+                          e.preventDefault();
                           e.stopPropagation();
                           const iframe = e.currentTarget.querySelector('iframe');
                           if (iframe) {
@@ -892,25 +929,25 @@ function PresentationEdit() {
                     <>
                       {/* Top-left handle */}
                       <div
-                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        className="absolute w-3 h-3 bg-blue-500 cursor-pointer"
                         style={{ top: '-5px', left: '-5px' }}
                         onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'top-left')}
                       />
                       {/* Top-right handle */}
                       <div
-                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        className="absolute w-3 h-3 bg-blue-500 cursor-pointer"
                         style={{ top: '-5px', right: '-5px' }}
                         onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'top-right')}
                       />
                       {/* Bottom-left handle */}
                       <div
-                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        className="absolute w-3 h-3 bg-blue-500 cursor-pointer"
                         style={{ bottom: '-5px', left: '-5px' }}
                         onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'bottom-left')}
                       />
                       {/* Bottom-right handle */}
                       <div
-                        className="absolute w-2 h-2 bg-blue-500 cursor-pointer"
+                        className="absolute w-3 h-3 bg-blue-500 cursor-pointer"
                         style={{ bottom: '-5px', right: '-5px' }}
                         onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'bottom-right')}
                       />
@@ -989,10 +1026,12 @@ function PresentationEdit() {
 
       </div>
       
-
+      <div className="relative">
       {/* Error Modal for Last Slide Deletion */}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ zIndex: 1000 }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">This is the last slide in your presentation!</h3>
             <p className="mb-4 text-gray-600">To delete this slide, you should delete the presentation instead.</p>
@@ -1058,7 +1097,9 @@ function PresentationEdit() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 1000 }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">Are you sure?</h3>
             <p className="mb-4 text-gray-600">Are you sure you want to delete this presentation?</p>
@@ -1076,7 +1117,8 @@ function PresentationEdit() {
 
       {showAddTextModal && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 1000 }}
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">
@@ -1089,20 +1131,7 @@ function PresentationEdit() {
               placeholder="Text Content"
               className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
             />
-            <input
-              type="number"
-              value={newTextElement.width}
-              onChange={(e) => setNewTextElement({ ...newTextElement, width: e.target.value })}
-              placeholder="Width (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="number"
-              value={newTextElement.height}
-              onChange={(e) => setNewTextElement({ ...newTextElement, height: e.target.value })}
-              placeholder="Height (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
+          
             <input
               type="number"
               value={newTextElement.fontSize}
@@ -1178,11 +1207,13 @@ function PresentationEdit() {
       
       {showAddImageModal && (
         <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
         style={{ zIndex: 1000 }} 
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Image Element</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              {isEditingImage ? 'Edit Image' : 'Add Image'}
+            </h3>
             <input
               type="text"
               value={newImageElement.src}
@@ -1202,26 +1233,30 @@ function PresentationEdit() {
               placeholder="Alt Description"
               className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
             />
-            <input
-              type="number"
-              value={newImageElement.width}
-              onChange={(e) => setNewImageElement({ ...newImageElement, width: e.target.value })}
-              placeholder="Width (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="number"
-              value={newImageElement.height}
-              onChange={(e) => setNewImageElement({ ...newImageElement, height: e.target.value })}
-              placeholder="Height (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
             <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowAddImageModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+              <button onClick={() => {
+                setShowAddImageModal(false)
+                setIsEditingImage(false);
+                setEditingImageElementId(null);
+                resetNewImageElement();
+              }} 
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              >
                 Cancel
               </button>
-              <button onClick={handleAddImageElement} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Save
+              
+              <button 
+                onClick={() => {
+                  if (isEditingImage) {
+                    handleAddImageElement();
+                    resetNewImageElement();
+                  } else {
+                    handleAddImageElement();
+                  }
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                {isEditingImage ? 'Save' : 'Add'}
               </button>
             </div>
           </div>
@@ -1241,44 +1276,7 @@ function PresentationEdit() {
               placeholder="YouTube Embedded URL"
               className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
             />
-            <input
-              type="number"
-              value={newVideoElement.width}
-              onChange={(e) => setNewVideoElement({ ...newVideoElement, width: e.target.value })}
-              placeholder="Width (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="number"
-              value={newVideoElement.height}
-              onChange={(e) => setNewVideoElement({ ...newVideoElement, height: e.target.value })}
-              placeholder="Height (%)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="number"
-              value={newVideoElement.position.x}
-              onChange={(e) =>
-                setNewVideoElement({
-                  ...newVideoElement,
-                  position: { ...newVideoElement.position, x: e.target.value },
-                })
-              }
-              placeholder="Position X (%)"
-              className="border p-2 w-full mb-4 rounded"
-            />
-            <input
-              type="number"
-              value={newVideoElement.position.y}
-              onChange={(e) =>
-                setNewVideoElement({
-                  ...newVideoElement,
-                  position: { ...newVideoElement.position, y: e.target.value },
-                })
-              }
-              placeholder="Position Y (%)"
-              className="border p-2 w-full mb-4 rounded"
-            />
+            
             <label className="block text-sm font-medium text-gray-700">
               <input
                 type="checkbox"
@@ -1325,20 +1323,7 @@ function PresentationEdit() {
               <option value="python">Python</option>
               <option value="c">C</option>
             </select>
-            <input
-              type="number"
-              value={newCodeElement.width}
-              onChange={(e) => setNewCodeElement({ ...newCodeElement, width: e.target.value })}
-              placeholder="Width (%)"
-              className="border p-2 w-full mb-4 rounded"
-            />
-            <input
-              type="number"
-              value={newCodeElement.height}
-              onChange={(e) => setNewCodeElement({ ...newCodeElement, height: e.target.value })}
-              placeholder="Height (%)"
-              className="border p-2 w-full mb-4 rounded"
-            />
+            
             <input
               type="number"
               value={newCodeElement.fontSize}
@@ -1346,34 +1331,7 @@ function PresentationEdit() {
               placeholder="Font Size (em)"
               className="border p-2 w-full mb-4 rounded"
             />
-            {isEditingCode && (
-              <>
-                <input
-                  type="number"
-                  value={newCodeElement.position.x}
-                  onChange={(e) =>
-                    setNewCodeElement({
-                      ...newCodeElement,
-                      position: { ...newCodeElement.position, x: e.target.value },
-                    })
-                  }
-                  placeholder="Position X (%)"
-                  className="border p-2 w-full mb-4 rounded"
-                />
-                <input
-                  type="number"
-                  value={newCodeElement.position.y}
-                  onChange={(e) =>
-                    setNewCodeElement({
-                      ...newCodeElement,
-                      position: { ...newCodeElement.position, y: e.target.value },
-                    })
-                  }
-                  placeholder="Position Y (%)"
-                  className="border p-2 w-full mb-4 rounded"
-                />
-              </>
-            )}
+            
             <div className="flex justify-end space-x-2">
               <button
                 
@@ -1654,8 +1612,10 @@ function PresentationEdit() {
 
 
     </div>
+    </div>
   );
 }
 
 export default PresentationEdit;
+
 
