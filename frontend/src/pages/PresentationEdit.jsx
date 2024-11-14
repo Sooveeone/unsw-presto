@@ -76,6 +76,8 @@ function PresentationEdit() {
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
   const [backgroundError, setBackgroundError] = useState('');
 
+  const [transitionStyle, setTransitionStyle] = useState({});
+
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
     e.preventDefault();
@@ -541,7 +543,7 @@ function PresentationEdit() {
     const newSlide = {
       id: `slide-${Date.now()}`,
       elements: [],
-      background: { ...defaultBackground, isDefaultColor: true }, // Set default background
+      background: { ...defaultBackground, isDefaultColor: true }, 
     };
   
     setPresentation({
@@ -569,13 +571,39 @@ function PresentationEdit() {
 
   const navigateToNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(-10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex + 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
-
+  
   const navigateToPreviousSlide = () => {
     if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+  
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex - 1);
+        setTransitionStyle({
+          opacity: 1,
+          transform: 'translateX(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+      }, 500); 
     }
   };
 
@@ -801,12 +829,13 @@ function PresentationEdit() {
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
                 style={{
+                  ...transitionStyle,
                   background:
                     presentation.slides[currentSlideIndex].background?.type === 'image'
                       ? `url(${presentation.slides[currentSlideIndex].background.value})`
                       : presentation.slides[currentSlideIndex].background?.type === 'gradient'
                       ? presentation.slides[currentSlideIndex].background.value
-                      : presentation.slides[currentSlideIndex].background?.value || // Use current slide background
+                      : presentation.slides[currentSlideIndex].background?.value || 
                         (defaultBackground.type === 'image'
                           ? `url(${defaultBackground.value})`
                           : defaultBackground.type === 'gradient'
