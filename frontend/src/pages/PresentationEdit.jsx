@@ -227,8 +227,8 @@ function PresentationEdit() {
   const newElement = {
     id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
     type: 'text',
-    ...newTextElement,
-    zIndex: presentation.slides[currentSlideIndex].elements.length + 1 
+    ...newTextElement, 
+    zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
   };
 
   const updatedSlides = presentation.slides.map((slide, index) =>
@@ -737,6 +737,7 @@ function PresentationEdit() {
                    width: `${element.width}%`,
                    height: `${element.height}%`,
                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
+                   fontFamily: element.type === 'text' ? element.fontFamily : 'initial',
                    color: element.color,
                    zIndex: element.zIndex,
                    border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
@@ -1025,6 +1026,19 @@ function PresentationEdit() {
               onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
               className="border p-2 w-full mb-4 rounded focus:outline-none"
             />
+            <select
+              value={newTextElement.fontFamily}
+              onChange={(e) => setNewTextElement({ ...newTextElement, fontFamily: e.target.value })}
+              className="border p-2 w-full mb-4 rounded focus:outline-none"
+            >
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Arial">Arial</option>
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Georgia">Georgia</option>
+            </select>
             {/* {isEditingElement && (
               <>
                 <input
