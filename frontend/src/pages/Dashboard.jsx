@@ -93,7 +93,7 @@ function Dashboard() {
             {presentations.map((presentation) => (
               <div 
                 key={presentation.id} 
-                onClick={() => navigate(`/${presentation.id}/edit`)}
+                onClick={() => navigate(`/${presentation.id}/edit/slide/1`)}
                 className="bg-platinum text-black max-w-md aspect-[2/1] rounded-lg shadow-lg flex flex-col transform transition-transform duration-500 hover:scale-105 cursor-pointer"
               >
                 <div className="flex-grow flex-2/3 p-0.5">

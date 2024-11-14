@@ -4,9 +4,10 @@ import axios from '../axiosConfig';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
 function PresentationPreview() {
-  const { presentationId } = useParams();
+  const { presentationId, slideIndex } = useParams();
+  const navigate = useNavigate();
   const [presentation, setPresentation] = useState(null);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(Number(slideIndex) - 1 || 0);
 
   // Fetch presentations on mount
   useEffect(() => {
@@ -27,6 +28,12 @@ function PresentationPreview() {
 
     fetchPresentation();
   }, [presentationId]);
+
+  // Update URL whenever slide index changes
+  
+  useEffect(() => {
+    navigate(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, { replace: true });
+  }, [currentSlideIndex, presentationId, navigate]);
 
   const navigateToNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {

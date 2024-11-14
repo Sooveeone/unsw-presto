@@ -14,7 +14,7 @@ hljs.registerLanguage('python', python);
 hljs.registerLanguage('c', c);
 
 function PresentationEdit() {
-  const { presentationId } = useParams();
+  const { presentationId, slideIndex } = useParams();
   const navigate = useNavigate();
   const [presentation, setPresentation] = useState(null);
   const [allPresentations, setAllPresentations] = useState([]);
@@ -24,7 +24,9 @@ function PresentationEdit() {
   const [showErrorModal, setShowErrorModal] = useState(false); 
   const [editedTitle, setEditedTitle] = useState('');
   const [thumbnail, setThumbnail] = useState('');
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(Number(slideIndex) - 1 || 0);
+
   const [showAddTextModal, setShowAddTextModal] = useState(false);
   const [showAddImageModal, setShowAddImageModal] = useState(false); 
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
@@ -62,6 +64,18 @@ function PresentationEdit() {
 
   // ! Function to handle setting selected element
   const [selectedElementId, setSelectedElementId] = useState(null);
+
+  // TODO:................................................................
+
+  // THis will update the url when switch slides
+  useEffect(() => {
+    if (presentation) {
+      // only update the slideshowd deck, not the whole page.
+      window.history.replaceState(null, '', `/edit/${presentationId}/slide/${currentSlideIndex + 1}`);
+    }
+  }, [currentSlideIndex, presentation, presentationId]);
+
+  // TODO: ..............................................................
 
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
@@ -629,6 +643,8 @@ function PresentationEdit() {
     navigate('/dashboard');
   };
 
+
+
   return (
     <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-lightGray to-lightBlue">
       {/*Sidebar on left */}
@@ -643,7 +659,7 @@ function PresentationEdit() {
         <HiEye
           onClick={async () => {
             await saveUpdatedThumbnail();
-            window.open(`/preview/${presentationId}/slide/${currentSlideIndex}`, '_blank');
+            window.open(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, '_blank');
           }}
           className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
         />
