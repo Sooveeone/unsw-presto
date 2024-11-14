@@ -62,6 +62,18 @@ function PresentationEdit() {
   // ! Function to handle setting selected element
   const [selectedElementId, setSelectedElementId] = useState(null);
 
+  const [defaultBackground, setDefaultBackground] = useState({
+    type: 'solid', 
+    value: '#ffffff', 
+  });
+  
+  const [currentSlideBackground, setCurrentSlideBackground] = useState({
+    type: 'solid', 
+    value: '', 
+  });
+  
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
     e.stopPropagation();
@@ -701,7 +713,17 @@ function PresentationEdit() {
           {/* Slide area refine later for shadow*/}
           <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
             {/* show slides */}
-            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
+                 style={{
+                   background:
+                     presentation.slides[currentSlideIndex].background?.value ||
+                     (defaultBackground.type === 'solid'
+                       ? defaultBackground.value
+                       : defaultBackground.type === 'gradient'
+                       ? defaultBackground.value
+                       : `url(${defaultBackground.value})`),
+                    backgroundSize: defaultBackground.type === 'image' ? 'cover' : 'initial',
+            }}>
               
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center">
@@ -868,6 +890,14 @@ function PresentationEdit() {
               className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </div>
+
+          <button
+            onClick={() => setShowBackgroundModal(true)}
+            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
+            style={{ zIndex: 2000 }}
+          >
+            Set Background
+          </button>
           
           {/* Previous and Next Slide Buttons */}
           <div className="flex flex-row items-center space-x-4">
@@ -1306,6 +1336,97 @@ function PresentationEdit() {
               
               >
                 {isEditingCode ? 'Save' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showBackgroundModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">Set Background</h3>
+
+            <div className="mb-4">
+              <label className="block font-bold mb-2">Background Type:</label>
+              <select
+                value={currentSlideBackground.type || defaultBackground.type}
+                onChange={(e) =>
+                  setCurrentSlideBackground({ ...currentSlideBackground, type: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="solid">Solid Color</option>
+                <option value="gradient">Gradient</option>
+                <option value="image">Image</option>
+              </select>
+            </div>
+
+            {currentSlideBackground.type === 'solid' && (
+              <div className="mb-4">
+                <label className="block font-bold mb-2">Color:</label>
+                <input
+                  type="color"
+                  value={currentSlideBackground.value || defaultBackground.value}
+                  onChange={(e) =>
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                  }
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            )}
+
+            {currentSlideBackground.type === 'gradient' && (
+              <div className="mb-4">
+                <label className="block font-bold mb-2">Gradient:</label>
+                <input
+                  type="text"
+                  placeholder="e.g., linear-gradient(to right, #ff7e5f, #feb47b)"
+                  value={currentSlideBackground.value || defaultBackground.value}
+                  onChange={(e) =>
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                  }
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            )}
+
+            {currentSlideBackground.type === 'image' && (
+              <div className="mb-4">
+                <label className="block font-bold mb-2">Image URL:</label>
+                <input
+                  type="text"
+                  placeholder="Enter image URL"
+                  value={currentSlideBackground.value || defaultBackground.value}
+                  onChange={(e) =>
+                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                  }
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowBackgroundModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Save the background settings for the current slide
+                  const updatedSlides = presentation.slides.map((slide, idx) =>
+                    idx === currentSlideIndex
+                      ? { ...slide, background: currentSlideBackground }
+                      : slide
+                  );
+                  setPresentation({ ...presentation, slides: updatedSlides });
+                  setShowBackgroundModal(false);
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Save
               </button>
             </div>
           </div>
