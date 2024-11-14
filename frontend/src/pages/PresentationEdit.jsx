@@ -73,7 +73,6 @@ function PresentationEdit() {
   });
   
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-  const [backgroundError, setBackgroundError] = useState(''); // State for error message
 
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
@@ -1498,7 +1497,7 @@ function PresentationEdit() {
                   placeholder="Enter image URL"
                   value={currentSlideBackground.value || ''}
                   onChange={(e) => {
-                    setBackgroundError(''); // Reset error on input change
+                    setBackgroundError(''); 
                     setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
                   }}
                   style={{
@@ -1545,7 +1544,7 @@ function PresentationEdit() {
               <button
                 onClick={() => {
                   setShowBackgroundModal(false);
-                  setBackgroundError(''); // Reset error when modal closes
+                  setBackgroundError(''); 
                 }}
                 style={{
                   padding: '0.5rem 1rem',
@@ -1578,7 +1577,7 @@ function PresentationEdit() {
                     image.onerror = () => {
                       setBackgroundError('Invalid image URL. Please check the URL.');
                     };
-                    image.src = currentSlideBackground.value; // Trigger the image validation
+                    image.src = currentSlideBackground.value;
                   } else {
                     const updatedSlides = presentation.slides.map((slide, idx) =>
                       idx === currentSlideIndex
