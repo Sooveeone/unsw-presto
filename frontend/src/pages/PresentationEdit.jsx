@@ -73,6 +73,7 @@ function PresentationEdit() {
   });
   
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [backgroundError, setBackgroundError] = useState('');
 
   // Handle dragging element
   const handleDragMouseDown = (e, elementId) => {
@@ -379,6 +380,44 @@ function PresentationEdit() {
     });
   };
 
+  const handleSetAsDefault = () => {
+    if (!currentSlideBackground.value) {
+      setBackgroundError('Please select a valid background to set as default.');
+      return;
+    }
+  
+    const newDefaultBackground = {
+      ...currentSlideBackground,
+      isDefaultColor: true, // Mark the new default background
+    };
+  
+    // Update slides with the new default background
+    const updatedSlides = presentation.slides.map((slide) => {
+      // If the slide's background is marked as default or matches the previous default, update it
+      if (
+        slide.background?.isDefaultColor || 
+        (!slide.background || // No custom background
+          (slide.background.value === defaultBackground.value &&
+            slide.background.type === defaultBackground.type))
+      ) {
+        return { ...slide, background: newDefaultBackground };
+      }
+  
+      // Retain slides with custom backgrounds
+      return {
+        ...slide,
+        background: {
+          ...slide.background,
+          isDefaultColor: false, // Mark other slides as not default
+        },
+      };
+    });
+  
+    setDefaultBackground(newDefaultBackground);
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowBackgroundModal(false); // Close modal
+  };
+
 //****************************************************** 
 
 
@@ -465,7 +504,12 @@ function PresentationEdit() {
 
   const addSlide = () => {
     if (!presentation) return;
-    const newSlide = { id: `slide-${Date.now()}`, elements: [] };
+    const newSlide = {
+      id: `slide-${Date.now()}`,
+      elements: [],
+      background: { ...defaultBackground, isDefaultColor: true }, // Set default background
+    };
+  
     setPresentation({
       ...presentation,
       slides: [...presentation.slides, newSlide],
@@ -596,6 +640,13 @@ function PresentationEdit() {
       setTimeout(() => hljs.highlightAll(), 0);
     }
   }, [presentation]);
+
+  useEffect(() => {
+    if (!currentSlideBackground.value) {
+      setCurrentSlideBackground({ ...defaultBackground });
+    }
+  }, [showBackgroundModal]);
+  
   
 
   if (!presentation) {
@@ -715,20 +766,21 @@ function PresentationEdit() {
           <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
-                 style={{
+                style={{
                   background:
                     presentation.slides[currentSlideIndex].background?.type === 'image'
-                      ? `url(${presentation.slides[currentSlideIndex].background?.value})`
+                      ? `url(${presentation.slides[currentSlideIndex].background.value})`
                       : presentation.slides[currentSlideIndex].background?.type === 'gradient'
-                      ? presentation.slides[currentSlideIndex].background?.value
-                      : presentation.slides[currentSlideIndex].background?.value ||
-                        (defaultBackground.type === 'solid'
-                          ? defaultBackground.value
+                      ? presentation.slides[currentSlideIndex].background.value
+                      : presentation.slides[currentSlideIndex].background?.value || // Use current slide background
+                        (defaultBackground.type === 'image'
+                          ? `url(${defaultBackground.value})`
                           : defaultBackground.type === 'gradient'
                           ? defaultBackground.value
-                          : `url(${defaultBackground.value})`),
+                          : defaultBackground.value),
                   backgroundSize:
-                    presentation.slides[currentSlideIndex].background?.type === 'image'
+                    presentation.slides[currentSlideIndex].background?.type === 'image' ||
+                    defaultBackground.type === 'image'
                       ? 'cover'
                       : 'initial',
                   backgroundPosition: 'center',
@@ -1497,7 +1549,7 @@ function PresentationEdit() {
                   placeholder="Enter image URL"
                   value={currentSlideBackground.value || ''}
                   onChange={(e) => {
-                    setBackgroundError(''); 
+                    setBackgroundError(''); // Reset error on input change
                     setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
                   }}
                   style={{
@@ -1532,11 +1584,7 @@ function PresentationEdit() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
               <button
-                onClick={() => {
-                  setDefaultBackground(currentSlideBackground);
-                  setShowBackgroundModal(false);
-                }
-                }
+                onClick={handleSetAsDefault}
                 className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
               >
                 Set as Default
@@ -1544,7 +1592,7 @@ function PresentationEdit() {
               <button
                 onClick={() => {
                   setShowBackgroundModal(false);
-                  setBackgroundError(''); 
+                  setBackgroundError(''); // Reset error when modal closes
                 }}
                 style={{
                   padding: '0.5rem 1rem',
@@ -1577,7 +1625,7 @@ function PresentationEdit() {
                     image.onerror = () => {
                       setBackgroundError('Invalid image URL. Please check the URL.');
                     };
-                    image.src = currentSlideBackground.value;
+                    image.src = currentSlideBackground.value; // Trigger the image validation
                   } else {
                     const updatedSlides = presentation.slides.map((slide, idx) =>
                       idx === currentSlideIndex
