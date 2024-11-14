@@ -715,15 +715,24 @@ function PresentationEdit() {
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
                  style={{
-                   background:
-                     presentation.slides[currentSlideIndex].background?.value ||
-                     (defaultBackground.type === 'solid'
-                       ? defaultBackground.value
-                       : defaultBackground.type === 'gradient'
-                       ? defaultBackground.value
-                       : `url(${defaultBackground.value})`),
-                    backgroundSize: defaultBackground.type === 'image' ? 'cover' : 'initial',
-            }}>
+                  background:
+                    presentation.slides[currentSlideIndex].background?.type === 'image'
+                      ? `url(${presentation.slides[currentSlideIndex].background?.value})`
+                      : presentation.slides[currentSlideIndex].background?.type === 'gradient'
+                      ? presentation.slides[currentSlideIndex].background?.value
+                      : presentation.slides[currentSlideIndex].background?.value ||
+                        (defaultBackground.type === 'solid'
+                          ? defaultBackground.value
+                          : defaultBackground.type === 'gradient'
+                          ? defaultBackground.value
+                          : `url(${defaultBackground.value})`),
+                  backgroundSize:
+                    presentation.slides[currentSlideIndex].background?.type === 'image'
+                      ? 'cover'
+                      : 'initial',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }}>
               
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center">
@@ -894,7 +903,6 @@ function PresentationEdit() {
           <button
             onClick={() => setShowBackgroundModal(true)}
             className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
-            style={{ zIndex: 2000 }}
           >
             Set Background
           </button>
@@ -1016,7 +1024,6 @@ function PresentationEdit() {
       {showAddTextModal && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">
