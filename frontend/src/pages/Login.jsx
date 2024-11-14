@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../axiosConfig';
-
+import BackToHomeButton from '../components/BackToHomeButton';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -32,6 +32,9 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
+      <div>
+      <BackToHomeButton />
+      </div>
       <form 
         onSubmit={handleLogin} 
         className="bg-platinum p-8 rounded-3xl shadow-xl w-full max-w-md"

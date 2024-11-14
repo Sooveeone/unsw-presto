@@ -699,9 +699,9 @@ function PresentationEdit() {
 
   useEffect(() => {
     if (presentation) {
-      setTimeout(() => hljs.highlightAll(), 0);
+      hljs.highlightAll();
     }
-  }, [presentation]);
+  }, [presentation, currentSlideIndex]);
 
   useEffect(() => {
     if (!currentSlideBackground.value) {

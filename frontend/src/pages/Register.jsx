@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../axiosConfig';
+import BackToHomeButton from '../components/BackToHomeButton';
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -46,6 +47,9 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
+       <div>
+      <BackToHomeButton />
+      </div>
       <form 
         onSubmit={handleRegister} 
         className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md"
