@@ -1,7 +1,15 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 import axios from '../axiosConfig';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import hljs from 'highlight.js';
+import 'highlight.js/styles/default.css';
+import javascript from 'highlight.js/lib/languages/javascript';
+import python from 'highlight.js/lib/languages/python';
+import c from 'highlight.js/lib/languages/c';
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('c', c);
 
 function PresentationPreview() {
   const { presentationId, slideIndex } = useParams();
@@ -37,6 +45,13 @@ function PresentationPreview() {
   
   useEffect(() => {
     navigate(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, { replace: true });
+    // need to wait navigate then highlight the code
+    setTimeout(() => {
+        const codeElements = document.querySelectorAll('code[class^="language-"]');
+        codeElements.forEach((codeElement) => {
+          hljs.highlightElement(codeElement);
+        });
+      }, 200);
   }, [currentSlideIndex, presentationId, navigate]);
 
   useEffect(() => {
@@ -52,9 +67,7 @@ function PresentationPreview() {
 
 
   const navigateToNextSlide = () => {
-    // if (currentSlideIndex < presentation.slides.length - 1) {
-    //   setCurrentSlideIndex(currentSlideIndex + 1);
-    // }
+
     if (currentSlideIndex < presentation.slides.length - 1) {
         setTransitionStyle({
           opacity: 0,
@@ -74,9 +87,7 @@ function PresentationPreview() {
   };
 
   const navigateToPreviousSlide = () => {
-    // if (currentSlideIndex > 0) {
-    //   setCurrentSlideIndex(currentSlideIndex - 1);
-    // }
+
     if (currentSlideIndex > 0) {
         setTransitionStyle({
           opacity: 0,
@@ -95,12 +106,23 @@ function PresentationPreview() {
       }
   };
 
+  const renderCodeElement = (element) => {
+    return (
+      <pre data-id={element.id}>
+        <code className={`language-${element.language}`}>
+          {element.code}
+        </code>
+      </pre>
+    );
+  };
+  
+
   if (!presentation) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-950 text-white">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-r from-slate-500 to-slate-300 text-white">
       {/* Slide area */}
       <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden"
         style={{
@@ -155,11 +177,7 @@ function PresentationPreview() {
                 allowFullScreen
                 className="object-cover"
               />
-            ) : element.type === 'code' ? (
-              <pre style={{ fontSize: `${element.fontSize}em`, color: element.color }}>
-                {element.text}
-              </pre>
-            ) : null}
+            ) : element.type === 'code' ? renderCodeElement(element) : null}
           </div>
         ))}
       </div>
