@@ -1,5 +1,4 @@
 // ThumbnailAndTitle.jsx
-import React from 'react';
 import { HiArrowUpOnSquare } from "react-icons/hi2";
 import { AiFillEdit } from "react-icons/ai";
 

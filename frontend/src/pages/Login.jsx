@@ -3,13 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from '../axiosConfig';
 import BackToHomeButton from '../components/BackToHomeButton';
 
+// Main function component for Login
 function Login() {
+  // State hooks to store email, password, error, and loading state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Function that handle login 
   const handleLogin = async (e) => {
 
     e.preventDefault();
@@ -18,8 +21,11 @@ function Login() {
     try {
       const response = await axios.post('/admin/auth/login', { email, password });
       localStorage.setItem('token', response.data.token); 
+
+      // Navigate to the dashboard after login
       navigate('/dashboard');
     } catch (err) {
+      // Handle errors
       if (err.respnse && err.respnse.data && err.respnse.data.message) {
         setError(err.respnse.data.message);
       } else {
@@ -33,12 +39,15 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
       <div>
-      <BackToHomeButton />
+        <BackToHomeButton />
       </div>
+
+      {/* Login form */}
       <form 
         onSubmit={handleLogin} 
         className="bg-platinum p-8 rounded-3xl shadow-xl w-full max-w-md"
-      >
+      > 
+        {/* Link to navigate back to landing page */}
         <Link to="/" className="absolute top-6 left-6 transform transition-transform duration-300 hover:scale-110">
           <span className="text-3xl font-bold text-black px-2 py-1 rounded font-serif ">
             Presto
@@ -47,6 +56,7 @@ function Login() {
         <h2 className="text-2xl font-sans text-black text-center mb-6">Login</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         
+        {/* Email and password input fields */}
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
           <input

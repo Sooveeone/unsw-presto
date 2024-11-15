@@ -1,4 +1,3 @@
-import React from "react";
 import { HiHome, HiEye, HiPencil, HiTrash, HiCommandLine, HiVideoCamera } from "react-icons/hi2";
 import { AiFillFileImage } from "react-icons/ai";
 

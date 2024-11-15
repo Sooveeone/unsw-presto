@@ -4,6 +4,7 @@ import axios from '../axiosConfig';
 import BackToHomeButton from '../components/BackToHomeButton';
 
 function Register() {
+  // State hooks for managing form inputs, error, and loading states
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -12,18 +13,21 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Function to handle user registration
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       setLoading(false);
       return;
     }
     try {
-
+      
+      // Send request to backend
       await axios.post('/admin/auth/register', { email, name, password });
   
       // Automatically will log in the user in by calling the login endpoint
@@ -34,6 +38,8 @@ function Register() {
       // Navigate to the dashboard
       navigate('/dashboard');
     } catch (err) {
+
+      // handle errors
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
@@ -47,9 +53,11 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
-       <div>
-      <BackToHomeButton />
+      <div>
+        <BackToHomeButton />
       </div>
+
+      {/* Registration form */}
       <form 
         onSubmit={handleRegister} 
         className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md"
@@ -61,6 +69,7 @@ function Register() {
         <h2 className="text-2xl font-sans text-black text-center mb-6">Register</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         
+        {/* Email input */}
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
           <input
@@ -74,6 +83,7 @@ function Register() {
           />
         </div>
 
+        {/* Name input */}
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 mb-2">Name</label>
           <input
@@ -87,6 +97,7 @@ function Register() {
           />
         </div>
 
+        {/* Password input */}
         <div className="mb-4">
           <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
           <input
