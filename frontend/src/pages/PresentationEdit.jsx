@@ -566,7 +566,23 @@ function PresentationEdit() {
       ...presentation,
       slides: [...presentation.slides, newSlide],
     });
-    setCurrentSlideIndex(presentation.slides.length);
+
+    setTransitionStyle({
+      opacity: 0,
+      transform: 'translateX(10%)', 
+      transition: 'opacity 0.5s ease, transform 0.5s ease',
+    });
+
+
+
+    setTimeout(() => {
+      setCurrentSlideIndex(presentation.slides.length);
+      setTransitionStyle({
+        opacity: 1,
+        transform: 'translateX(0)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+    }, 500); 
   };
 
   const deleteSlide = (slideId) => {

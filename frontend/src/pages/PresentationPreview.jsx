@@ -8,7 +8,11 @@ function PresentationPreview() {
   const navigate = useNavigate();
   const [presentation, setPresentation] = useState(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(Number(slideIndex) - 1 || 0);
-
+  const [transitionStyle, setTransitionStyle] = useState({});
+  const [defaultBackground, setDefaultBackground] = useState({
+    type: 'solid', 
+    value: '#ffffff', 
+  });
   // Fetch presentations on mount
   useEffect(() => {
     const fetchPresentation = async () => {
@@ -48,15 +52,47 @@ function PresentationPreview() {
 
 
   const navigateToNextSlide = () => {
+    // if (currentSlideIndex < presentation.slides.length - 1) {
+    //   setCurrentSlideIndex(currentSlideIndex + 1);
+    // }
     if (currentSlideIndex < presentation.slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
-    }
+        setTransitionStyle({
+          opacity: 0,
+          transform: 'translateX(-10%)', 
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+    
+        setTimeout(() => {
+          setCurrentSlideIndex(currentSlideIndex + 1);
+          setTransitionStyle({
+            opacity: 1,
+            transform: 'translateX(0)',
+            transition: 'opacity 0.5s ease, transform 0.5s ease',
+          });
+        }, 500); 
+      }
   };
 
   const navigateToPreviousSlide = () => {
+    // if (currentSlideIndex > 0) {
+    //   setCurrentSlideIndex(currentSlideIndex - 1);
+    // }
     if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
-    }
+        setTransitionStyle({
+          opacity: 0,
+          transform: 'translateX(10%)', 
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        });
+    
+        setTimeout(() => {
+          setCurrentSlideIndex(currentSlideIndex - 1);
+          setTransitionStyle({
+            opacity: 1,
+            transform: 'translateX(0)',
+            transition: 'opacity 0.5s ease, transform 0.5s ease',
+          });
+        }, 500); 
+      }
   };
 
   if (!presentation) {
@@ -66,7 +102,29 @@ function PresentationPreview() {
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-950 text-white">
       {/* Slide area */}
-      <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
+      <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden"
+        style={{
+            ...transitionStyle,
+            background:
+              presentation.slides[currentSlideIndex].background?.type === 'image'
+                ? `url(${presentation.slides[currentSlideIndex].background.value})`
+                : presentation.slides[currentSlideIndex].background?.type === 'gradient'
+                ? presentation.slides[currentSlideIndex].background.value
+                : presentation.slides[currentSlideIndex].background?.value || 
+                  (defaultBackground.type === 'image'
+                    ? `url(${defaultBackground.value})`
+                    : defaultBackground.type === 'gradient'
+                    ? defaultBackground.value
+                    : defaultBackground.value),
+            backgroundSize:
+              presentation.slides[currentSlideIndex].background?.type === 'image' ||
+              defaultBackground.type === 'image'
+                ? 'cover'
+                : 'initial',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+      >
         {/* Render elements */}
         {presentation.slides[currentSlideIndex].elements.map((element) => (
           <div
