@@ -8,6 +8,7 @@ import 'highlight.js/styles/default.css';
 import javascript from 'highlight.js/lib/languages/javascript';
 import python from 'highlight.js/lib/languages/python';
 import c from 'highlight.js/lib/languages/c';
+import Sidebar from '../components/Sidebar.jsx';
 
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('python', python);
@@ -758,78 +759,23 @@ function PresentationEdit() {
 
   return (
     <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-slate-500 to-slate-300">
-      {/*Sidebar on left */}
-      <div className="flex flex-col w-1/8 bg-black justify-between p-4">
-        {/* Back button refine later */}
-        <div className="flex flex-col text-white font-extralight">
-          <HiHome 
-            onClick={handleBackAndSave} 
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
-          />
-          <span>Home</span>
-        </div>
-        
-        <div className="flex flex-col text-white font-extralight">
-          <HiEye
-            onClick={async () => {
-              await saveUpdatedThumbnail();
-              window.open(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, '_blank');
-            }}
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
-          />
-          <span className="ml-1">View</span>
-        </div>
-        
-        <div className="flex flex-col text-white font-extralight">
-          <HiPencil
-            onClick={() => setShowAddTextModal(true)}
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
-          />
-          <span className="ml-1">Text</span>
-        </div>
-        
-        <div className="flex flex-col text-white font-extralight">
-          <AiFillFileImage
-            onClick={() => setShowAddImageModal(true)} 
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
-          />
-          <span>Image</span>
-        </div>
-
-        <div className="flex flex-col text-white font-extralight">
-          <HiVideoCamera 
-            onClick={() => {
-              
-              setShowAddVideoModal(true);
-            }}
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200"
-          />
-          <span>Video</span>
-        </div>
-
-        <div className="flex flex-col text-white font-extralight">
-          <HiCommandLine
-            onClick={() => {
-              
-              // Reset to add modal mode
-              setIsEditingCode(false); 
-              setEditingCodeElementId(null); 
-              setShowAddCodeModal(true);
-            }}
-            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200"
-          />  
-          <span className="ml-0.5">Code</span>
-        </div>
-        
-        <div className="flex flex-col text-white font-extralight">
-          <HiTrash  
-            onClick={() => setShowDeleteModal(true)} 
-            className="text-platinumLight w-11 h-11  hover:scale-125 transition-transform duration-200"
-          />
-          <span>Delete</span>
-        </div>
-
-      </div>
+      {/* Sidebar Component */}
+      <Sidebar
+        onHomeClick={handleBackAndSave}
+        onViewClick={async () => {
+          await saveUpdatedThumbnail();
+          window.open(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, '_blank');
+        }}
+        onTextClick={() => setShowAddTextModal(true)}
+        onImageClick={() => setShowAddImageModal(true)}
+        onVideoClick={() => setShowAddVideoModal(true)}
+        onCodeClick={() => {
+          setIsEditingCode(false);
+          setEditingCodeElementId(null);
+          setShowAddCodeModal(true);
+        }}
+        onDeleteClick={() => setShowDeleteModal(true)}
+      />
 
       {/* Presentation area*/}
       <div className="flex flex-col flex-grow p-2 space-y-4">
