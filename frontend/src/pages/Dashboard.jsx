@@ -62,16 +62,18 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-lightGray to-lightBlue text-white">
-      <div className="flex items-center justify-between p-6">
-        <div className="text-3xl font-bold">
-          <span className="text-black px-2 py-1 rounded font-serif">Presto</span>
-        </div>
+    <div 
+    className="flex flex-col min-h-screen bg-gradient-to-r from-slate-300 to-slate-500"
+    style={{}}
+    >
+      <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-400 to-slate-600 shadow-md">
+        <h1 className="text-2xl font-semibold text-Black font-serif">Presto</h1>
         <button 
-          onClick={handleLogout} 
-          className="px-4 py-2 bg-black text-white font-semibold rounded-lg hover:bg-white hover:text-black transition duration-200"
-        >
-          Logout
+         class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br group-hover:from-blue-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-lightBlue dark:focus:ring-lightBlue"
+         onClick={handleLogout} >
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+        Logout
+        </span>
         </button>
       </div>
 
@@ -81,23 +83,23 @@ function Dashboard() {
         <div className="w-3/4 md:w-1/5 max-w-xs mx-auto">
           <button 
             onClick={() => setShowModal(true)} 
-            className="w-full px-4 py-2 bg-primaryBlue text-platinum font-semibold rounded-lg transform transition-transform duration-500 delay-2000 hover:scale-105 md:mt-0"
+            className="px-6 py-3 bg-black bg-opacity-85 text-white font-semibold rounded-md shadow-md hover:bg-white hover:text-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-200"
           >
-            Create
+            Create Presentation
           </button>
         </div>
 
         {/* card area */}
-        <div className="flex-grow flex justify-center">
+        <div className="flex-grow flex justify-center font-normal">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {presentations.map((presentation) => (
               <div 
                 key={presentation.id} 
                 onClick={() => navigate(`/${presentation.id}/edit`)}
-                className="bg-platinum text-black max-w-md aspect-[2/1] rounded-lg shadow-lg flex flex-col transform transition-transform duration-500 hover:scale-105 cursor-pointer"
+                className="bg-platinum text-black max-w-md aspect-[2/1] shadow-lg flex flex-col transform transition-transform duration-500 hover:scale-105 cursor-pointer"
               >
-                <div className="flex-grow flex-2/3 p-0.5">
-                  <div className="w-full h-40 flex items-center justify-center bg-gray-300">
+                <div className="flex-grow flex-2/3">
+                  <div className="w-full h-40 flex items-center justify-center bg-black bg-opacity-90">
                     {presentation.thumbnail ? (
                       <img src={presentation.thumbnail} alt="Thumbnail" className="w-full h-full object-contain rounded-lg" />
                     ) : (
@@ -113,7 +115,7 @@ function Dashboard() {
                     )}
                   </div>
                   <div className="flex items-center">
-                    <p className="text-sm text-gray-500">{presentation.slides.length} slides</p>
+                    <p className="text-sm text-gray-500">Number of slides: {presentation.slides.length}</p>
                   </div>
                 </div>
               </div>
