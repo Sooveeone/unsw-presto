@@ -1,5 +1,4 @@
 // SlideNavigationButtons.jsx
-import React from 'react';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
 const SlideNavigationButtons = ({ navigateToPreviousSlide, navigateToNextSlide, currentSlideIndex, totalSlides }) => (

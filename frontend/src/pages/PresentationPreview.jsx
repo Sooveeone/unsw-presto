@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 import axios from '../axiosConfig';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
@@ -7,6 +7,8 @@ import 'highlight.js/styles/default.css';
 import javascript from 'highlight.js/lib/languages/javascript';
 import python from 'highlight.js/lib/languages/python';
 import c from 'highlight.js/lib/languages/c';
+
+// Register the required languages for syntax highlighting
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('python', python);
 hljs.registerLanguage('c', c);
@@ -17,10 +19,13 @@ function PresentationPreview() {
   const [presentation, setPresentation] = useState(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(Number(slideIndex) - 1 || 0);
   const [transitionStyle, setTransitionStyle] = useState({});
-  const [defaultBackground, setDefaultBackground] = useState({
-    type: 'solid', 
-    value: '#ffffff', 
-  });
+  
+  // Define the default background as a constant
+  const defaultBackground = {
+    type: 'solid',
+    value: '#ffffff',
+  };
+
   // Fetch presentations on mount
   useEffect(() => {
     const fetchPresentation = async () => {
@@ -47,13 +52,14 @@ function PresentationPreview() {
     navigate(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, { replace: true });
     // need to wait navigate then highlight the code
     setTimeout(() => {
-        const codeElements = document.querySelectorAll('code[class^="language-"]');
-        codeElements.forEach((codeElement) => {
-          hljs.highlightElement(codeElement);
-        });
-      }, 200);
+      const codeElements = document.querySelectorAll('code[class^="language-"]');
+      codeElements.forEach((codeElement) => {
+        hljs.highlightElement(codeElement);
+      });
+    }, 200);
   }, [currentSlideIndex, presentationId, navigate]);
 
+  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'ArrowLeft') navigateToPreviousSlide();
@@ -65,47 +71,49 @@ function PresentationPreview() {
     };
   }, [currentSlideIndex, presentation]);
 
-
+  // functions to naviate slides
   const navigateToNextSlide = () => {
 
     if (currentSlideIndex < presentation.slides.length - 1) {
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(-10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+    
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex + 1);
         setTransitionStyle({
-          opacity: 0,
-          transform: 'translateX(-10%)', 
+          opacity: 1,
+          transform: 'translateX(0)',
           transition: 'opacity 0.5s ease, transform 0.5s ease',
         });
-    
-        setTimeout(() => {
-          setCurrentSlideIndex(currentSlideIndex + 1);
-          setTransitionStyle({
-            opacity: 1,
-            transform: 'translateX(0)',
-            transition: 'opacity 0.5s ease, transform 0.5s ease',
-          });
-        }, 500); 
-      }
+      }, 500); 
+    }
   };
 
+  // functions to navigate slides
   const navigateToPreviousSlide = () => {
 
     if (currentSlideIndex > 0) {
+      setTransitionStyle({
+        opacity: 0,
+        transform: 'translateX(10%)', 
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      });
+    
+      setTimeout(() => {
+        setCurrentSlideIndex(currentSlideIndex - 1);
         setTransitionStyle({
-          opacity: 0,
-          transform: 'translateX(10%)', 
+          opacity: 1,
+          transform: 'translateX(0)',
           transition: 'opacity 0.5s ease, transform 0.5s ease',
         });
-    
-        setTimeout(() => {
-          setCurrentSlideIndex(currentSlideIndex - 1);
-          setTransitionStyle({
-            opacity: 1,
-            transform: 'translateX(0)',
-            transition: 'opacity 0.5s ease, transform 0.5s ease',
-          });
-        }, 500); 
-      }
+      }, 500); 
+    }
   };
 
+  // Render code elements on the slide
   const renderCodeElement = (element) => {
     return (
       <pre data-id={element.id}>
@@ -126,26 +134,26 @@ function PresentationPreview() {
       {/* Slide area */}
       <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden"
         style={{
-            ...transitionStyle,
-            background:
+          ...transitionStyle,
+          background:
               presentation.slides[currentSlideIndex].background?.type === 'image'
                 ? `url(${presentation.slides[currentSlideIndex].background.value})`
                 : presentation.slides[currentSlideIndex].background?.type === 'gradient'
-                ? presentation.slides[currentSlideIndex].background.value
-                : presentation.slides[currentSlideIndex].background?.value || 
+                  ? presentation.slides[currentSlideIndex].background.value
+                  : presentation.slides[currentSlideIndex].background?.value || 
                   (defaultBackground.type === 'image'
                     ? `url(${defaultBackground.value})`
                     : defaultBackground.type === 'gradient'
-                    ? defaultBackground.value
-                    : defaultBackground.value),
-            backgroundSize:
+                      ? defaultBackground.value
+                      : defaultBackground.value),
+          backgroundSize:
               presentation.slides[currentSlideIndex].background?.type === 'image' ||
               defaultBackground.type === 'image'
                 ? 'cover'
                 : 'initial',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
       >
         {/* Render elements */}
         {presentation.slides[currentSlideIndex].elements.map((element) => (
@@ -183,32 +191,32 @@ function PresentationPreview() {
       </div>
 
       {/* Slide navigation */}
-  <div className="absolute bottom-4 left-4 text-2xl bg-black bg-opacity-80 rounded-lg p-2"
-    style={{ zIndex: 1000 }}
-  >
-    {currentSlideIndex + 1} of {presentation.slides.length}
-  </div>
- {/* Navigation buttons container in the right bottom */}
- <div className="absolute bottom-4 right-4 flex items-center space-x-4 bg-black bg-opacity-80 p-3 rounded-lg"
-    style={{ zIndex: 1000 }}
- >
-    {/* Previous Slide Button */}
-    <HiChevronLeft
-      onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
-      className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
-        currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-white hover:scale-125"
-      }`}
-    />
-    {/* Next Slide Button */}
-    <HiChevronRight
-      onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
-      className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
-        currentSlideIndex === presentation.slides.length - 1
-          ? "text-gray-400 cursor-not-allowed"
-          : "text-white hover:scale-125"
-      }`}
-    />
-  </div>
+      <div className="absolute bottom-4 left-4 text-2xl bg-black bg-opacity-80 rounded-lg p-2"
+        style={{ zIndex: 1000 }}
+      >
+        {currentSlideIndex + 1} of {presentation.slides.length}
+      </div>
+      {/* Navigation buttons container in the right bottom */}
+      <div className="absolute bottom-4 right-4 flex items-center space-x-4 bg-black bg-opacity-80 p-3 rounded-lg"
+        style={{ zIndex: 1000 }}
+      >
+        {/* Previous Slide Button */}
+        <HiChevronLeft
+          onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
+          className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
+            currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-white hover:scale-125"
+          }`}
+        />
+        {/* Next Slide Button */}
+        <HiChevronRight
+          onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
+          className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
+            currentSlideIndex === presentation.slides.length - 1
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-white hover:scale-125"
+          }`}
+        />
+      </div>
     </div>
   );
 }

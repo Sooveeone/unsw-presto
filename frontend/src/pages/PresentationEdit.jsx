@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
-import { HiHome, HiEye, HiTrash, HiEyeDropper, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiOutlinePlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
-import { AiFillEdit, AiFillFileImage} from "react-icons/ai";
+import { HiTrash, HiEyeDropper, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiOutlinePlusCircle } from "react-icons/hi2";
+import { AiFillEdit } from "react-icons/ai";
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -63,10 +63,10 @@ function PresentationEdit() {
   const [isEditingCode, setIsEditingCode] = useState(false);
   const [editingCodeElementId, setEditingCodeElementId] = useState(null);
 
-  // ! Function to handle setting selected element
+  
   const [selectedElementId, setSelectedElementId] = useState(null);
 
-  // TODO:................................................................
+  
 
   // THis will update the url when switch slides
   useEffect(() => {
@@ -76,7 +76,7 @@ function PresentationEdit() {
     }
   }, [currentSlideIndex, presentation, presentationId]);
 
-  // TODO: ..............................................................
+  
 
   const [defaultBackground, setDefaultBackground] = useState({
     type: 'solid', 
@@ -216,7 +216,6 @@ function PresentationEdit() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   };
-// ! ************************************************************************************************
 
   const [newImageElement, setNewImageElement] = useState({
     src: '',
@@ -241,11 +240,11 @@ function PresentationEdit() {
       const updatedSlides = presentation.slides.map((slide, index) =>
         index === currentSlideIndex
           ? {
-              ...slide,
-              elements: slide.elements.map(el =>
-                el.id === editingImageElementId ? { ...el, ...newImageElement } : el
-              ),
-            }
+            ...slide,
+            elements: slide.elements.map(el =>
+              el.id === editingImageElementId ? { ...el, ...newImageElement } : el
+            ),
+          }
           : slide
       );
   
@@ -273,26 +272,25 @@ function PresentationEdit() {
   };
 
   // Handle add text elements
- // Handle add text elements ********************************
- const handleAddTextElement = () => {
-  const newElement = {
-    id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-    type: 'text',
-    ...newTextElement, 
-    zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
+  const handleAddTextElement = () => {
+    const newElement = {
+      id: `element-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      type: 'text',
+      ...newTextElement, 
+      zIndex: presentation.slides[currentSlideIndex].elements.length + 1,
+    };
+
+    const updatedSlides = presentation.slides.map((slide, index) =>
+      index === currentSlideIndex
+        ? { ...slide, elements: [...slide.elements, newElement] }
+        : slide
+    );
+
+    setPresentation({ ...presentation, slides: updatedSlides });
+    setShowAddTextModal(false);
   };
 
-  const updatedSlides = presentation.slides.map((slide, index) =>
-    index === currentSlideIndex
-      ? { ...slide, elements: [...slide.elements, newElement] }
-      : slide
-  );
-
-  setPresentation({ ...presentation, slides: updatedSlides });
-  setShowAddTextModal(false);
-};
-
-  // Handle add text elements ********************************
+  // Handle edit text elements 
   const handleEditTextElement = (elementId) => {
     const element = presentation.slides[currentSlideIndex].elements.find(el => el.id === elementId);
     if (element) {
@@ -422,16 +420,16 @@ function PresentationEdit() {
 
 
 
-    // Function to reset newTextElement to default values
-    const resetNewImageElement = () => {
-      setNewImageElement({
-        src: '',
-        width: 50,
-        height: 30,
-        alt: '',
-        position: { x: 0, y: 0 }
-      });
-    };
+  // Function to reset newTextElement to default values
+  const resetNewImageElement = () => {
+    setNewImageElement({
+      src: '',
+      width: 50,
+      height: 30,
+      alt: '',
+      position: { x: 0, y: 0 }
+    });
+  };
 
   const handleSetAsDefault = () => {
     if (!currentSlideBackground.value) {
@@ -471,7 +469,7 @@ function PresentationEdit() {
     setShowBackgroundModal(false); // Close modal
   };
 
-//****************************************************** 
+
 
 
   // Fetch presentations on mount
@@ -695,13 +693,13 @@ function PresentationEdit() {
     const updatedSlides = presentation.slides.map((slide, index) =>
       index === currentSlideIndex
         ? {
-            ...slide,
-            elements: slide.elements.map((el) =>
-              el.id === editingCodeElementId
-                ? { ...newCodeElement, id: editingCodeElementId }
-                : el
-            ),
-          }
+          ...slide,
+          elements: slide.elements.map((el) =>
+            el.id === editingCodeElementId
+              ? { ...newCodeElement, id: editingCodeElementId }
+              : el
+          ),
+        }
         : slide
     );
   
@@ -799,8 +797,8 @@ function PresentationEdit() {
             )}
             
             <HiArrowUpOnSquare
-                onClick={() => setShowEditThumbnailModal(true)}
-                className=" bottom-1 right-1 text-primaryBlue w-7 h-7 cursor-pointer hover:scale-125 transition-transform duration-200"
+              onClick={() => setShowEditThumbnailModal(true)}
+              className=" bottom-1 right-1 text-primaryBlue w-7 h-7 cursor-pointer hover:scale-125 transition-transform duration-200"
             />
           </div>
           
@@ -823,27 +821,27 @@ function PresentationEdit() {
           <div className="flex-grow flex items-center justify-center   rounded-lg">
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
-                style={{
-                  ...transitionStyle,
-                  background:
+              style={{
+                ...transitionStyle,
+                background:
                     presentation.slides[currentSlideIndex].background?.type === 'image'
                       ? `url(${presentation.slides[currentSlideIndex].background.value})`
                       : presentation.slides[currentSlideIndex].background?.type === 'gradient'
-                      ? presentation.slides[currentSlideIndex].background.value
-                      : presentation.slides[currentSlideIndex].background?.value || 
+                        ? presentation.slides[currentSlideIndex].background.value
+                        : presentation.slides[currentSlideIndex].background?.value || 
                         (defaultBackground.type === 'image'
                           ? `url(${defaultBackground.value})`
                           : defaultBackground.type === 'gradient'
-                          ? defaultBackground.value
-                          : defaultBackground.value),
-                  backgroundSize:
+                            ? defaultBackground.value
+                            : defaultBackground.value),
+                backgroundSize:
                     presentation.slides[currentSlideIndex].background?.type === 'image' ||
                     defaultBackground.type === 'image'
                       ? 'cover'
                       : 'initial',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                }}>
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}>
               
               {/* Slide Index */}
               <div className="absolute bottom-2 left-2 text-lg text-gray-700 w-12 h-12 flex items-center justify-center"
@@ -855,98 +853,93 @@ function PresentationEdit() {
               {/* Render elements */}
               {presentation.slides[currentSlideIndex].elements.map((element) => (
                 <div
-                 key={element.id}
-                 onMouseDown={(e) => handleDragMouseDown(e, element.id)}
-                 onDoubleClick={() =>
-                  element.type === 'text'
-                    ? handleEditTextElement(element.id)
-                    : element.type === 'image'
-                    ? handleEditImageElement(element.id)
-                    : element.type === 'code'
-                    ? handleEditCodeElement(element.id)
-                    : element.type === 'video'
-                    ? handleEditVideoElement(element.id)
-                    : null
-                 }
-                 onClick={() => setSelectedElementId(element.id)}
-                 onContextMenu={(e) => {
-                   e.preventDefault();
-                   e.stopPropagation();
-                   handleDeleteElement(element.id);
-                 }}
-                 style={{
-                   position: 'absolute',
-                   top: `${element.position.y}%`,
-                   left: `${element.position.x}%`,
-                   width: `${element.width}%`,
-                   height: `${element.height}%`,
-                   fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
-                   fontFamily: element.type === 'text' ? element.fontFamily : 'initial',
-                   color: element.color,
-                   zIndex: element.zIndex,
-                   border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
-                 }}
-                 className="overflow-hidden"
-               >
-                 {element.type === 'text' ? (
-                   element.text
-                 ) : element.type === 'image' ? (
-                   <img src={element.src} alt={element.alt} className="object-cover w-full h-full" />
-                 ) : element.type === 'video' ? (
-                      <div
+                  key={element.id}
+                  onMouseDown={(e) => handleDragMouseDown(e, element.id)}
+                  onDoubleClick={() =>
+                    element.type === 'text'
+                      ? handleEditTextElement(element.id)
+                      : element.type === 'image'
+                        ? handleEditImageElement(element.id)
+                        : element.type === 'code'
+                          ? handleEditCodeElement(element.id)
+                          : element.type === 'video'
+                            ? handleEditVideoElement(element.id)
+                            : null
+                  }
+                  onClick={() => setSelectedElementId(element.id)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDeleteElement(element.id);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: `${element.position.y}%`,
+                    left: `${element.position.x}%`,
+                    width: `${element.width}%`,
+                    height: `${element.height}%`,
+                    fontSize: element.type === 'text' ? `${element.fontSize}em` : 'initial',
+                    fontFamily: element.type === 'text' ? element.fontFamily : 'initial',
+                    color: element.color,
+                    zIndex: element.zIndex,
+                    border: element.type === 'video' ? '2px dashed blue' : '1px solid #d3d3d3'
+                  }}
+                  className="overflow-hidden"
+                >
+                  {element.type === 'text' ? (
+                    element.text
+                  ) : element.type === 'image' ? (
+                    <img src={element.src} alt={element.alt} className="object-cover w-full h-full" />
+                  ) : element.type === 'video' ? (
+                    <div
                       style={{
-                          position: 'absolute',
-                          top: `${element.position.y}%`,
-                          left: `${element.position.x}%`,
-                          width: `${element.width}%`,
-                          height: `${element.height}%`,
-                          zIndex: element.zIndex,
-                          border: '2px dashed blue',
-                          boxSizing: 'border-box',
+                        position: 'absolute',
+                        top: `${element.position.y}%`,
+                        left: `${element.position.x}%`,
+                        width: `${element.width}%`,
+                        height: `${element.height}%`,
+                        zIndex: element.zIndex,
+                        border: '2px dashed blue',
+                        boxSizing: 'border-box',
+                      }}
+                      onClick={(e) => {
+                        // Enable interactivity on single click
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const iframe = e.currentTarget.querySelector('iframe');
+                        if (iframe) {
+                          iframe.style.pointerEvents = 'auto';
+                        }
+                      }}
+                      onDoubleClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`Double-clicked video element with id: ${element.id}`);
+                        handleEditVideoElement(element.id);
+                  
+                        
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteElement(element.id);
+                      }}
+                      className="video-container"
+                    >
+                      <iframe
+                        src={`${element.src}${element.autoplay ? '?autoplay=1' : ''}`}
+                        width="100%"
+                        height="100%"
+                        allow="autoplay"
+                        frameBorder="0"
+                        allowFullScreen
+                        style={{
+                          pointerEvents: 'none', 
+                          objectFit: 'cover', 
                         }}
-                        onClick={(e) => {
-                          // Enable interactivity on single click
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const iframe = e.currentTarget.querySelector('iframe');
-                          if (iframe) {
-                            iframe.style.pointerEvents = 'auto';
-                          }
-                        }}
-                        onDoubleClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          console.log(`Double-clicked video element with id: ${element.id}`);
-                          handleEditVideoElement(element.id);
-                    
-                          
-                        }}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          console.log("Deleting");
-                          console.log("Deleting");
-                          console.log("Deleting");
-                          console.log("Deleting");
-                          console.log("Deleting");
-                          handleDeleteElement(element.id);
-                        }}
-                        className="video-container"
-                      >
-                        <iframe
-                          src={`${element.src}${element.autoplay ? '?autoplay=1' : ''}`}
-                          width="100%"
-                          height="100%"
-                          allow="autoplay"
-                          frameBorder="0"
-                          allowFullScreen
-                          style={{
-                            pointerEvents: 'none', 
-                            objectFit: 'cover', 
-                          }}
-                          className="object-cover"
-                        />
-                      </div>
+                        className="object-cover"
+                      />
+                    </div>
                   ) : element.type === 'code' ? renderCodeElement(element): null} 
                   {/* Resizeing below */}
                   {selectedElementId === element.id && (
@@ -977,24 +970,42 @@ function PresentationEdit() {
                       />
                     </>
                   )}
-               </div>
-             ))}
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Slideshow Deck Sidebar */}
           <div className="w-1/8 flex flex-col space-y-6">
-            
-            <HiTrash  
-              onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
-              className=" w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
-            />
+            <div className="relative group">
+              {/* HiTrash Icon */}
+              <HiTrash
+                onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
+                className="w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+              />
+              {/* Tooltip */}
+              <span 
+                className="absolute right-10 top-1/2 transform -translate-y-1/2 px-2 py-1 text-sm text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                Delete Slide
+              </span>
+            </div>
 
-            <HiEyeDropper 
-              onClick={() => setShowBackgroundModal(true)}
-              className=" w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
-            />
-
+            {/* HiEyeDropper Icon */}
+            <div className="relative group">
+              <HiEyeDropper 
+                onClick={() => setShowBackgroundModal(true)}
+                className="w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+              />
+              {/* Tooltip for Set Background */}
+              <span 
+                className="absolute right-10 top-1/2 transform -translate-y-1/2 px-2 py-1 text-sm text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                Set Background Color
+              </span>
+            </div>
           </div>
 
         </div>
@@ -1013,12 +1024,6 @@ function PresentationEdit() {
             />
           </div>
 
-          {/* <button
-            onClick={() => setShowBackgroundModal(true)}
-            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
-          >
-            Set Backgroudcolor
-          </button> */}
           
           {/* Previous and Next Slide Buttons */}
           <div className="flex flex-row items-center space-x-4">
@@ -1040,415 +1045,367 @@ function PresentationEdit() {
               }`}
             />
           </div>
-
-
         </div>
-
-
-
-
       </div>
       
       <div className="relative">
-      {/* Error Modal for Last Slide Deletion */}
-      {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-        style={{ zIndex: 1000 }}
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">This is the last slide in your presentation!</h3>
-            <p className="mb-4 text-gray-600">To delete this slide, you should delete the presentation instead.</p>
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowErrorModal(false)} className="px-4 py-2 bg-lightGray rounded-lg hover:bg-gray-400">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )} 
-
-      {/* Edit Title Modal */}
-      {showEditTitleModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Title</h3>
-            <input
-              type="text"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              placeholder="New Title"
-              className="border p-2 w-full mb-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-            />
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowEditTitleModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
-                Cancel
-              </button>
-              <button onClick={saveUpdatedTitle} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Thumbnail Modal */}
-      {showEditThumbnailModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Thumbnail</h3>
-            <input
-              type="file"
-              onChange={handleThumbnailChange}
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            {thumbnail && (
-              <div className="mb-4">
-                <img src={thumbnail} alt="Thumbnail Preview" className="w-24 h-24 object-cover rounded" />
+        {/* Error Modal for Last Slide Deletion */}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">This is the last slide in your presentation!</h3>
+              <p className="mb-4 text-gray-600">To delete this slide, you should delete the presentation instead.</p>
+              <div className="flex justify-end space-x-2">
+                <button onClick={() => setShowErrorModal(false)} className="px-4 py-2 bg-lightGray rounded-lg hover:bg-gray-400">
+                  Close
+                </button>
               </div>
-            )}
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowEditThumbnailModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
-                Cancel
-              </button>
-              <button onClick={saveUpdatedThumbnail} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                Save
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )} 
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Are you sure?</h3>
-            <p className="mb-4 text-gray-600">Are you sure you want to delete this presentation?</p>
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
-                Cancel
-              </button>
-              <button onClick={handleDeletePresentation} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAddTextModal && (
-        <div 
-          className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 1000 }}
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
-              {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
-            </h3>
-            <input
-              type="text"
-              value={newTextElement.text}
-              onChange={(e) => setNewTextElement({ ...newTextElement, text: e.target.value })}
-              placeholder="Text Content"
-              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
-            />
-          
-            <input
-              type="number"
-              value={newTextElement.fontSize}
-              onChange={(e) => setNewTextElement({ ...newTextElement, fontSize: e.target.value })}
-              placeholder="Font Size (em)"
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="color"
-              value={newTextElement.color}
-              onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <select
-              value={newTextElement.fontFamily}
-              onChange={(e) => setNewTextElement({ ...newTextElement, fontFamily: e.target.value })}
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            >
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Arial">Arial</option>
-              <option value="Comic Sans MS">Comic Sans MS</option>
-              <option value="Trebuchet MS">Trebuchet MS</option>
-              <option value="Courier New">Courier New</option>
-              <option value="Verdana">Verdana</option>
-              <option value="Georgia">Georgia</option>
-            </select>
-            {/* {isEditingElement && (
-              <>
-                <input
-                  type="number"
-                  value={newTextElement.position?.x}
-                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, x: e.target.value } })}
-                  placeholder="Position X (%)"
-                  className="border p-2 w-full mb-4 rounded focus:outline-none"
-                />
-                <input
-                  type="number"
-                  value={newTextElement.position?.y}
-                  onChange={(e) => setNewTextElement({ ...newTextElement, position: { ...newTextElement.position, y: e.target.value } })}
-                  placeholder="Position Y (%)"
-                  className="border p-2 w-full mb-4 rounded focus:outline-none"
-                />
-              </>
-            )} */}
-            <div className="flex justify-end space-x-2">
-              <button 
-                onClick={() => {
-                  setShowAddTextModal(false);
-                  setIsEditingElement(false);
-                  setEditingElementId(null);
-                }}
-                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => {
-                  if (isEditingElement) {
-                    handleUpdateTextElement();
-                    resetNewTextElement();
-                  } else {
-                    handleAddTextElement();
-                  }
-                }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                {isEditingElement ? 'Save' : 'Add'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {showAddImageModal && (
-        <div
-        className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
-        style={{ zIndex: 1000 }} 
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
-              {isEditingImage ? 'Edit Image' : 'Add Image'}
-            </h3>
-            <input
-              type="text"
-              value={newImageElement.src}
-              onChange={(e) => setNewImageElement({ ...newImageElement, src: e.target.value })}
-              placeholder="Image URL"
-              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
-            />
-            <input
-              type="file"
-              onChange={handleImageUpload}
-              className="border p-2 w-full mb-4 rounded focus:outline-none"
-            />
-            <input
-              type="text"
-              value={newImageElement.alt}
-              onChange={(e) => setNewImageElement({ ...newImageElement, alt: e.target.value })}
-              placeholder="Alt Description"
-              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
-            />
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => {
-                setShowAddImageModal(false)
-                setIsEditingImage(false);
-                setEditingImageElementId(null);
-                resetNewImageElement();
-              }} 
-                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              
-              <button 
-                onClick={() => {
-                  if (isEditingImage) {
-                    handleAddImageElement();
-                    resetNewImageElement();
-                  } else {
-                    handleAddImageElement();
-                  }
-                }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                {isEditingImage ? 'Save' : 'Add'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAddVideoModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 1000 }}>
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
-              {newVideoElement.id ? 'Edit Video Element' : 'Add Video Element'}
-            </h3>
-            <input
-              type="text"
-              value={newVideoElement.src}
-              onChange={(e) => setNewVideoElement({ ...newVideoElement, src: e.target.value })}
-              placeholder="YouTube Embedded URL"
-              className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
-            />
-            
-            <label className="block text-sm font-medium text-gray-700">
+        {/* Edit Title Modal */}
+        {showEditTitleModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Title</h3>
               <input
-                type="checkbox"
-                checked={newVideoElement.autoplay}
-                onChange={(e) => setNewVideoElement({ ...newVideoElement, autoplay: e.target.checked })}
-                className="mr-2"
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                placeholder="New Title"
+                className="border p-2 w-full mb-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
               />
+              <div className="flex justify-end space-x-2">
+                <button onClick={() => setShowEditTitleModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                Cancel
+                </button>
+                <button onClick={saveUpdatedTitle} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Thumbnail Modal */}
+        {showEditThumbnailModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Thumbnail</h3>
+              <input
+                type="file"
+                onChange={handleThumbnailChange}
+                className="border p-2 w-full mb-4 rounded focus:outline-none"
+              />
+              {thumbnail && (
+                <div className="mb-4">
+                  <img src={thumbnail} alt="Thumbnail Preview" className="w-24 h-24 object-cover rounded" />
+                </div>
+              )}
+              <div className="flex justify-end space-x-2">
+                <button onClick={() => setShowEditThumbnailModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                Cancel
+                </button>
+                <button onClick={saveUpdatedThumbnail} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">Are you sure?</h3>
+              <p className="mb-4 text-gray-600">Are you sure you want to delete this presentation?</p>
+              <div className="flex justify-end space-x-2">
+                <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                Cancel
+                </button>
+                <button onClick={handleDeletePresentation} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAddTextModal && (
+          <div 
+            className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
+                {isEditingElement ? 'Edit Text Element' : 'Add Text Element'}
+              </h3>
+              <input
+                type="text"
+                value={newTextElement.text}
+                onChange={(e) => setNewTextElement({ ...newTextElement, text: e.target.value })}
+                placeholder="Text Content"
+                className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+              />
+            
+              <input
+                type="number"
+                value={newTextElement.fontSize}
+                onChange={(e) => setNewTextElement({ ...newTextElement, fontSize: e.target.value })}
+                placeholder="Font Size (em)"
+                className="border p-2 w-full mb-4 rounded focus:outline-none"
+              />
+              <input
+                type="color"
+                value={newTextElement.color}
+                onChange={(e) => setNewTextElement({ ...newTextElement, color: e.target.value })}
+                className="border p-2 w-full mb-4 rounded focus:outline-none"
+              />
+              <select
+                value={newTextElement.fontFamily}
+                onChange={(e) => setNewTextElement({ ...newTextElement, fontFamily: e.target.value })}
+                className="border p-2 w-full mb-4 rounded focus:outline-none"
+              >
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial">Arial</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Georgia">Georgia</option>
+              </select>
+              
+              <div className="flex justify-end space-x-2">
+                <button 
+                  onClick={() => {
+                    setShowAddTextModal(false);
+                    setIsEditingElement(false);
+                    setEditingElementId(null);
+                  }}
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                >
+                Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    if (isEditingElement) {
+                      handleUpdateTextElement();
+                      resetNewTextElement();
+                    } else {
+                      handleAddTextElement();
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  {isEditingElement ? 'Save' : 'Add'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      
+        {showAddImageModal && (
+          <div
+            className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center"
+            style={{ zIndex: 1000 }} 
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
+                {isEditingImage ? 'Edit Image' : 'Add Image'}
+              </h3>
+              <input
+                type="text"
+                value={newImageElement.src}
+                onChange={(e) => setNewImageElement({ ...newImageElement, src: e.target.value })}
+                placeholder="Image URL"
+                className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+              />
+              <input
+                type="file"
+                onChange={handleImageUpload}
+                className="border p-2 w-full mb-4 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                value={newImageElement.alt}
+                onChange={(e) => setNewImageElement({ ...newImageElement, alt: e.target.value })}
+                placeholder="Alt Description"
+                className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+              />
+              <div className="flex justify-end space-x-2">
+                <button onClick={() => {
+                  setShowAddImageModal(false)
+                  setIsEditingImage(false);
+                  setEditingImageElementId(null);
+                  resetNewImageElement();
+                }} 
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                >
+                Cancel
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    if (isEditingImage) {
+                      handleAddImageElement();
+                      resetNewImageElement();
+                    } else {
+                      handleAddImageElement();
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  {isEditingImage ? 'Save' : 'Add'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAddVideoModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 1000 }}>
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
+                {newVideoElement.id ? 'Edit Video Element' : 'Add Video Element'}
+              </h3>
+              <input
+                type="text"
+                value={newVideoElement.src}
+                onChange={(e) => setNewVideoElement({ ...newVideoElement, src: e.target.value })}
+                placeholder="YouTube Embedded URL"
+                className="border p-2 w-full mb-4 rounded focus:outline-none text-gray-800"
+              />
+              
+              <label className="block text-sm font-medium text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={newVideoElement.autoplay}
+                  onChange={(e) => setNewVideoElement({ ...newVideoElement, autoplay: e.target.checked })}
+                  className="mr-2"
+                />
               Auto-play
-            </label>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button onClick={() => setShowAddVideoModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+              </label>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button onClick={() => setShowAddVideoModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
                 Cancel
-              </button>
-              <button
-                onClick={newVideoElement.id ? handleAddVideoElement : handleAddVideoElement}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                {newVideoElement.id ? 'Save' : 'Add'}
-              </button>
+                </button>
+                <button
+                  onClick={newVideoElement.id ? handleAddVideoElement : handleAddVideoElement}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  {newVideoElement.id ? 'Save' : 'Add'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Code modal */}
-      {showAddCodeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center " style={{ zIndex: 1000 }}>
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-bold mb-4">{isEditingCode ? 'Edit Code Element' : 'Add Code Element'}</h3>
-            <textarea
-              rows="5"
-              value={newCodeElement.code}
-              onChange={(e) => setNewCodeElement({ ...newCodeElement, code: e.target.value })}
-              placeholder="Write your code here"
-              className="border p-2 w-full mb-4 rounded"
-              style={{ whiteSpace: 'pre' }}
-            />
-            <select
-              value={newCodeElement.language}
-              onChange={(e) => setNewCodeElement({ ...newCodeElement, language: e.target.value })}
-              className="border p-2 w-full mb-4 rounded"
-            >
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python</option>
-              <option value="c">C</option>
-            </select>
-            
-            <input
-              type="number"
-              value={newCodeElement.fontSize}
-              onChange={(e) => setNewCodeElement({ ...newCodeElement, fontSize: e.target.value })}
-              placeholder="Font Size (em)"
-              className="border p-2 w-full mb-4 rounded"
-            />
-            
-            <div className="flex justify-end space-x-2">
-              <button
-                
-                onClick={() => {
-                  setShowAddCodeModal(false);
-                  setIsEditingElement(false);
-                  setEditingElementId(null);
-                }}
-               
-                className="px-4 py-2 bg-gray-300 rounded-lg"
-              
+        {/* Code modal */}
+        {showAddCodeModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center " style={{ zIndex: 1000 }}>
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+              <h3 className="text-xl font-bold mb-4">{isEditingCode ? 'Edit Code Element' : 'Add Code Element'}</h3>
+              <textarea
+                rows="5"
+                value={newCodeElement.code}
+                onChange={(e) => setNewCodeElement({ ...newCodeElement, code: e.target.value })}
+                placeholder="Write your code here"
+                className="border p-2 w-full mb-4 rounded"
+                style={{ whiteSpace: 'pre' }}
+              />
+              <select
+                value={newCodeElement.language}
+                onChange={(e) => setNewCodeElement({ ...newCodeElement, language: e.target.value })}
+                className="border p-2 w-full mb-4 rounded"
               >
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="c">C</option>
+              </select>
+              
+              <input
+                type="number"
+                value={newCodeElement.fontSize}
+                onChange={(e) => setNewCodeElement({ ...newCodeElement, fontSize: e.target.value })}
+                placeholder="Font Size (em)"
+                className="border p-2 w-full mb-4 rounded"
+              />
+              
+              <div className="flex justify-end space-x-2">
+                <button
+                  
+                  onClick={() => {
+                    setShowAddCodeModal(false);
+                    setIsEditingElement(false);
+                    setEditingElementId(null);
+                  }}
+                
+                  className="px-4 py-2 bg-gray-300 rounded-lg"
+                
+                >
                 Cancel
-              </button>
-              <button
+                </button>
+                <button
+                  
+                  onClick={isEditingCode ? handleUpdateCodeElement : isEditingElement ? handleUpdateTextElement : handleAddCodeElement}
                 
-                onClick={isEditingCode ? handleUpdateCodeElement : isEditingElement ? handleUpdateTextElement : handleAddCodeElement}
-               
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-              
-              >
-                {isEditingCode ? 'Save' : 'Add'}
-              </button>
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                
+                >
+                  {isEditingCode ? 'Save' : 'Add'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {showBackgroundModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 2000,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        {showBackgroundModal && (
           <div
             style={{
-              position: 'relative',
-              zIndex: 2001,
-              backgroundColor: 'white',
-              padding: '1rem',
-              borderRadius: '8px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              width: '24rem',
-              maxWidth: '90%',
+              position: 'fixed',
+              inset: 0,
+              zIndex: 2000,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1a202c' }}>
-              Set Background
-            </h3>
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 2001,
+                backgroundColor: 'white',
+                padding: '1rem',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                width: '24rem',
+                maxWidth: '90%',
+              }}
+            >
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1a202c' }}>
+                Set Background
+              </h3>
 
-            {/* Background Type Selection */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                Background Type:
-              </label>
-              <select
-                value={currentSlideBackground.type || defaultBackground.type}
-                onChange={(e) =>
-                  setCurrentSlideBackground({ ...currentSlideBackground, type: e.target.value })
-                }
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                }}
-              >
-                <option value="solid">Solid Color</option>
-                <option value="gradient">Gradient</option>
-                <option value="image">Image</option>
-              </select>
-            </div>
-
-            {/* Solid Color Picker */}
-            {currentSlideBackground.type === 'solid' && (
+              {/* Background Type Selection */}
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                  Color:
+                  Background Type:
                 </label>
-                <input
-                  type="color"
-                  value={currentSlideBackground.value || defaultBackground.value}
+                <select
+                  value={currentSlideBackground.type || defaultBackground.type}
                   onChange={(e) =>
-                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                    setCurrentSlideBackground({ ...currentSlideBackground, type: e.target.value })
                   }
                   style={{
                     width: '100%',
@@ -1456,149 +1413,187 @@ function PresentationEdit() {
                     border: '1px solid #ccc',
                     borderRadius: '4px',
                   }}
-                />
+                >
+                  <option value="solid">Solid Color</option>
+                  <option value="gradient">Gradient</option>
+                  <option value="image">Image</option>
+                </select>
               </div>
-            )}
 
-            {/* Gradient Color Picker */}
-            {currentSlideBackground.type === 'gradient' && (
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                  Gradient Colors:
-                </label>
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                      Color From:
-                    </label>
-                    <input
-                      type="color"
-                      value={currentSlideBackground.colorFrom || '#ffffff'}
-                      onChange={(e) => {
-                        const newColorFrom = e.target.value;
-                        setCurrentSlideBackground((prev) => {
-                          const updatedBackground = {
-                            ...prev,
-                            colorFrom: newColorFrom,
-                            value: `linear-gradient(to right, ${newColorFrom}, ${prev.colorTo || '#000000'})`,
-                          };
-                          return updatedBackground;
-                        });
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '0.5rem',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                      Color To:
-                    </label>
-                    <input
-                      type="color"
-                      value={currentSlideBackground.colorTo || '#000000'}
-                      onChange={(e) => {
-                        const newColorTo = e.target.value;
-                        setCurrentSlideBackground((prev) => {
-                          const updatedBackground = {
-                            ...prev,
-                            colorTo: newColorTo,
-                            value: `linear-gradient(to right, ${prev.colorFrom || '#ffffff'}, ${newColorTo})`,
-                          };
-                          return updatedBackground;
-                        });
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '0.5rem',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                      }}
-                    />
+              {/* Solid Color Picker */}
+              {currentSlideBackground.type === 'solid' && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                    Color:
+                  </label>
+                  <input
+                    type="color"
+                    value={currentSlideBackground.value || defaultBackground.value}
+                    onChange={(e) =>
+                      setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value })
+                    }
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Gradient Color Picker */}
+              {currentSlideBackground.type === 'gradient' && (
+                <div>
+                  <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                    Gradient Colors:
+                  </label>
+                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                        Color From:
+                      </label>
+                      <input
+                        type="color"
+                        value={currentSlideBackground.colorFrom || '#ffffff'}
+                        onChange={(e) => {
+                          const newColorFrom = e.target.value;
+                          setCurrentSlideBackground((prev) => {
+                            const updatedBackground = {
+                              ...prev,
+                              colorFrom: newColorFrom,
+                              value: `linear-gradient(to right, ${newColorFrom}, ${prev.colorTo || '#000000'})`,
+                            };
+                            return updatedBackground;
+                          });
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                        Color To:
+                      </label>
+                      <input
+                        type="color"
+                        value={currentSlideBackground.colorTo || '#000000'}
+                        onChange={(e) => {
+                          const newColorTo = e.target.value;
+                          setCurrentSlideBackground((prev) => {
+                            const updatedBackground = {
+                              ...prev,
+                              colorTo: newColorTo,
+                              value: `linear-gradient(to right, ${prev.colorFrom || '#ffffff'}, ${newColorTo})`,
+                            };
+                            return updatedBackground;
+                          });
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Image URL Input */}
-            {currentSlideBackground.type === 'image' && (
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                  Image URL:
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter image URL"
-                  value={currentSlideBackground.value || ''}
-                  onChange={(e) => {
-                    setBackgroundError(''); // Reset error on input change
-                    setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
+              {/* Image URL Input */}
+              {currentSlideBackground.type === 'image' && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                    Image URL:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter image URL"
+                    value={currentSlideBackground.value || ''}
+                    onChange={(e) => {
+                      setBackgroundError(''); // Reset error on input change
+                      setCurrentSlideBackground({ ...currentSlideBackground, value: e.target.value });
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                    }}
+                  />
+                  {backgroundError && (
+                    <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                      {backgroundError}
+                    </div>
+                  )}
+                  {currentSlideBackground.value && (
+                    <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                      <img
+                        src={currentSlideBackground.value}
+                        alt="Background Preview"
+                        style={{
+                          maxWidth: '100%',
+                          height: 'auto',
+                          borderRadius: '4px',
+                          border: '1px solid #ccc',
+                        }}
+                        onError={() => setBackgroundError('Invalid image URL. Please check the URL.')}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                <button
+                  onClick={handleSetAsDefault}
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                >
+                Set as Default
+                </button>
+                <button
+                  onClick={() => {
+                    setShowBackgroundModal(false);
+                    setBackgroundError(''); // Reset error when modal closes
                   }}
                   style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    border: '1px solid #ccc',
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#e2e8f0',
                     borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: 'none',
                   }}
-                />
-                {backgroundError && (
-                  <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                    {backgroundError}
-                  </div>
-                )}
-                {currentSlideBackground.value && (
-                  <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                    <img
-                      src={currentSlideBackground.value}
-                      alt="Background Preview"
-                      style={{
-                        maxWidth: '100%',
-                        height: 'auto',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                      }}
-                      onError={() => setBackgroundError('Invalid image URL. Please check the URL.')}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-              <button
-                onClick={handleSetAsDefault}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-              >
-                Set as Default
-              </button>
-              <button
-                onClick={() => {
-                  setShowBackgroundModal(false);
-                  setBackgroundError(''); // Reset error when modal closes
-                }}
-                style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#e2e8f0',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  border: 'none',
-                }}
-              >
+                >
                 Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setBackgroundError('');
-                  if (currentSlideBackground.type === 'image') {
-                    if (!currentSlideBackground.value) {
-                      setBackgroundError('Image URL cannot be empty. Please enter a valid URL.');
-                      return;
-                    }
-                    const image = new Image();
-                    image.onload = () => {
+                </button>
+                <button
+                  onClick={() => {
+                    setBackgroundError('');
+                    if (currentSlideBackground.type === 'image') {
+                      if (!currentSlideBackground.value) {
+                        setBackgroundError('Image URL cannot be empty. Please enter a valid URL.');
+                        return;
+                      }
+                      const image = new Image();
+                      image.onload = () => {
+                        const updatedSlides = presentation.slides.map((slide, idx) =>
+                          idx === currentSlideIndex
+                            ? { ...slide, background: currentSlideBackground }
+                            : slide
+                        );
+                        setPresentation({ ...presentation, slides: updatedSlides });
+                        setShowBackgroundModal(false);
+                      };
+                      image.onerror = () => {
+                        setBackgroundError('Invalid image URL. Please check the URL.');
+                      };
+                      image.src = currentSlideBackground.value; // Trigger the image validation
+                    } else {
                       const updatedSlides = presentation.slides.map((slide, idx) =>
                         idx === currentSlideIndex
                           ? { ...slide, background: currentSlideBackground }
@@ -1606,39 +1601,26 @@ function PresentationEdit() {
                       );
                       setPresentation({ ...presentation, slides: updatedSlides });
                       setShowBackgroundModal(false);
-                    };
-                    image.onerror = () => {
-                      setBackgroundError('Invalid image URL. Please check the URL.');
-                    };
-                    image.src = currentSlideBackground.value; // Trigger the image validation
-                  } else {
-                    const updatedSlides = presentation.slides.map((slide, idx) =>
-                      idx === currentSlideIndex
-                        ? { ...slide, background: currentSlideBackground }
-                        : slide
-                    );
-                    setPresentation({ ...presentation, slides: updatedSlides });
-                    setShowBackgroundModal(false);
-                  }
-                }}
-                style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  border: 'none',
-                }}
-              >
+                    }
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: 'none',
+                  }}
+                >
                 Save
-              </button>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
 
-    </div>
+      </div>
     </div>
   );
 }

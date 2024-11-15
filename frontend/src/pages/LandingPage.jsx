@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function LandingPage() {
@@ -68,7 +68,7 @@ function LandingPage() {
         </p>
         <div className="text-base text-black" style={{ lineHeight: '1.8'}}>
           Create captivating and professional slide decks effortlessly. <br/>
-          With the help of our user-friendly tools and features, save time and create presentations that are special.
+          With the help of our user-friendly tools and features, save time and create presentations that are special.
         </div>
       </div>
     </div>

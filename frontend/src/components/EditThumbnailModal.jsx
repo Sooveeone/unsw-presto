@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const EditThumbnailModal = ({ onClose, onSave, thumbnail, handleThumbnailChange }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

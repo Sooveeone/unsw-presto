@@ -26,7 +26,7 @@ function Dashboard() {
     fetchStore();
   }, []);
 
- 
+  // Remove the token after log out
   const handleLogout = async () => {
     try {
       await axios.post('/admin/auth/logout');
@@ -37,7 +37,7 @@ function Dashboard() {
     }
   };
 
-
+  // Function to create a presentation card
   const handleCreatePresentation = async () => {
     const newPresentation = {
       id: `presentation-${Date.now()}`,
@@ -63,17 +63,17 @@ function Dashboard() {
 
   return (
     <div 
-    className="flex flex-col min-h-screen bg-gradient-to-r from-slate-300 to-slate-500"
-    style={{}}
+      className="flex flex-col min-h-screen bg-gradient-to-r from-slate-300 to-slate-500"
+      style={{}}
     >
       <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-400 to-slate-600 shadow-md">
         <h1 className="text-2xl font-semibold text-Black font-serif">Presto</h1>
         <button 
-         class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br group-hover:from-blue-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-lightBlue dark:focus:ring-lightBlue"
-         onClick={handleLogout} >
-        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br group-hover:from-blue-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-lightBlue dark:focus:ring-lightBlue"
+          onClick={handleLogout} >
+          <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
         Logout
-        </span>
+          </span>
         </button>
       </div>
 
@@ -124,7 +124,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal for create a prensentation card*/}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">

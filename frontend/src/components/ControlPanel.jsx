@@ -1,5 +1,4 @@
 // ControlPanel.jsx
-import React from 'react';
 import { HiPlusCircle } from "react-icons/hi2";
 import SlideNavigationButtons from './SlideNavigationButtons';
 
