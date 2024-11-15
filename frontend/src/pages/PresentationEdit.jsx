@@ -757,7 +757,7 @@ function PresentationEdit() {
 
 
   return (
-    <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-lightGray to-lightBlue">
+    <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-slate-500 to-slate-300">
       {/*Sidebar on left */}
       <div className="flex flex-col w-1/8 bg-black justify-between p-4">
         {/* Back button refine later */}

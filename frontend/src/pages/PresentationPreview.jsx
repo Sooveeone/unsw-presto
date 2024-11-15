@@ -122,7 +122,7 @@ function PresentationPreview() {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-950 text-white">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-r from-slate-500 to-slate-300 text-white">
       {/* Slide area */}
       <div className="relative w-full aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden"
         style={{
