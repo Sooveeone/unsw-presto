@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 import axios from '../axiosConfig';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
@@ -45,6 +45,13 @@ function PresentationPreview() {
   
   useEffect(() => {
     navigate(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, { replace: true });
+    // need to wait navigate then highlight the code
+    setTimeout(() => {
+        const codeElements = document.querySelectorAll('code[class^="language-"]');
+        codeElements.forEach((codeElement) => {
+          hljs.highlightElement(codeElement);
+        });
+      }, 200);
   }, [currentSlideIndex, presentationId, navigate]);
 
   useEffect(() => {
@@ -60,9 +67,7 @@ function PresentationPreview() {
 
 
   const navigateToNextSlide = () => {
-    // if (currentSlideIndex < presentation.slides.length - 1) {
-    //   setCurrentSlideIndex(currentSlideIndex + 1);
-    // }
+
     if (currentSlideIndex < presentation.slides.length - 1) {
         setTransitionStyle({
           opacity: 0,
@@ -82,9 +87,7 @@ function PresentationPreview() {
   };
 
   const navigateToPreviousSlide = () => {
-    // if (currentSlideIndex > 0) {
-    //   setCurrentSlideIndex(currentSlideIndex - 1);
-    // }
+
     if (currentSlideIndex > 0) {
         setTransitionStyle({
           opacity: 0,
@@ -102,6 +105,17 @@ function PresentationPreview() {
         }, 500); 
       }
   };
+
+  const renderCodeElement = (element) => {
+    return (
+      <pre data-id={element.id}>
+        <code className={`language-${element.language}`}>
+          {element.code}
+        </code>
+      </pre>
+    );
+  };
+  
 
   if (!presentation) {
     return <div>Loading...</div>;
