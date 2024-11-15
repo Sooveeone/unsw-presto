@@ -101,7 +101,7 @@ function Dashboard() {
                     {presentation.thumbnail ? (
                       <img src={presentation.thumbnail} alt="Thumbnail" className="w-full h-full object-contain rounded-lg" />
                     ) : (
-                      <span className="text-gray-500">Image Placeholder</span>
+                      <span className="text-gray-500">Thumbnail Image</span>
                     )}
                   </div>
                 </div>
