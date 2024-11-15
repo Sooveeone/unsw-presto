@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import PresentationEdit from './pages/PresentationEdit';
+import PresentationPreview from './pages/PresentationPreview';
 
 function App() {
   return (
@@ -14,7 +15,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/:presentationId/edit" element={<PresentationEdit />} />
+        {/* <Route path="/:presentationId/edit" element={<PresentationEdit />} /> */}
+        <Route path="/:presentationId/edit/slide/:slideIndex" element={<PresentationEdit />} />
+        <Route path="/preview/:presentationId/slide/:slideIndex" element={<PresentationPreview />} />
+
       </Routes>
     </Router>
   );
