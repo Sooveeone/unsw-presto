@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../axiosConfig';
+import BackToHomeButton from '../components/BackToHomeButton';
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -46,6 +47,9 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
+       <div>
+      <BackToHomeButton />
+      </div>
       <form 
         onSubmit={handleRegister} 
         className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md"
@@ -63,7 +67,7 @@ function Register() {
             type="email"
             id="email"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Your Email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -76,7 +80,7 @@ function Register() {
             type="text"
             id="name"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Your Name"
+            placeholder="Enter your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -89,7 +93,7 @@ function Register() {
             type="password"
             id="password"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Password"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -102,7 +106,7 @@ function Register() {
             type="password"
             id="confirmPassword"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Confirm Password"
+            placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
