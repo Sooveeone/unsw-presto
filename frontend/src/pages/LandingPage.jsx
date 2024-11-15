@@ -49,13 +49,13 @@ function LandingPage() {
         <div className="space-x-4">
           <Link
             to="/login"
-            className="px-4 py-2 bg-black text-white font-semibold rounded-lg hover:bg-white hover:text-black transition duration-220"
+            className="px-4 py-2  text-black font-semibold rounded-lg hover:bg-white hover:text-black transition duration-220"
           >
             Login
           </Link>
           <Link
             to="/register"
-            className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-black hover:text-white transition duration-220"
+            className="px-4 py-2 bg-black text-white font-semibold rounded-lg hover:bg-white hover:text-black transition duration-220"
           >
             Register
           </Link>
@@ -66,6 +66,10 @@ function LandingPage() {
         <p className="text-2xl mb-8 text-black font-bold">
           Presto <span className="text-white">{text}</span>
         </p>
+        <div className="text-base text-black" style={{ lineHeight: '1.8'}}>
+          Create captivating and professional slide decks effortlessly. <br/>
+          With the help of our user-friendly tools and features, save time and create presentations that are special.
+        </div>
       </div>
     </div>
   );

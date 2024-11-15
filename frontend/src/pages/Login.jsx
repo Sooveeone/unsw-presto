@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../axiosConfig';
-
+import BackToHomeButton from '../components/BackToHomeButton';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -32,6 +32,9 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBlue to-lightGray">
+      <div>
+      <BackToHomeButton />
+      </div>
       <form 
         onSubmit={handleLogin} 
         className="bg-platinum p-8 rounded-3xl shadow-xl w-full max-w-md"
@@ -50,7 +53,7 @@ function Login() {
             type="email"
             id="email"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -63,7 +66,7 @@ function Login() {
             type="password"
             id="password"
             className="w-full p-3 border border-lightGray rounded focus:outline-none focus:ring-2 focus:ring-primaryBlue"
-            placeholder="Password"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
