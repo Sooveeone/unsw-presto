@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
-import { HiHome, HiEye, HiTrash, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiPlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
-import { AiFillEdit, AiFillFileImage } from "react-icons/ai";
+import { HiHome, HiEye, HiTrash, HiEyeDropper, HiArrowUpOnSquare, HiChevronLeft, HiChevronRight, HiOutlinePlusCircle, HiPencil, HiVideoCamera, HiCommandLine } from "react-icons/hi2";
+import { AiFillEdit, AiFillFileImage} from "react-icons/ai";
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -41,7 +41,7 @@ function PresentationEdit() {
   });
   const [newTextElement, setNewTextElement] = useState({
     text: '',
-    width: 50,
+    width: 30,
     height: 20,
     fontSize: 1,
     color: '#000000',
@@ -759,62 +759,82 @@ function PresentationEdit() {
   return (
     <div className="flex flex-row min-h-screen space-x-4 bg-gradient-to-r from-lightGray to-lightBlue">
       {/*Sidebar on left */}
-      <div className="flex flex-col w-1/8 bg-black justify-between">
+      <div className="flex flex-col w-1/8 bg-black justify-between p-4">
         {/* Back button refine later */}
-  
-        <HiHome 
-          onClick={handleBackAndSave} 
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
-        />
-
-        <HiEye
-          onClick={async () => {
-            await saveUpdatedThumbnail();
-            window.open(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, '_blank');
-          }}
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
-        />
-
-        <HiPencil
-          onClick={() => setShowAddTextModal(true)}
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
-        />
-
-        <AiFillFileImage
-          onClick={() => setShowAddImageModal(true)} 
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200" 
-        />
-
-        <HiVideoCamera 
-           onClick={() => {
-            
-            setShowAddVideoModal(true);
-          }}
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
-        />
-
-        <HiCommandLine
-           onClick={() => {
-            
-            // Reset to add modal mode
-            setIsEditingCode(false); 
-            setEditingCodeElementId(null); 
-            setShowAddCodeModal(true);
-          }}
-          className="text-platinumLight w-12 h-12 cursor-pointer hover:scale-110 transition-transform duration-200"
-        />  
+        <div className="flex flex-col text-white font-extralight">
+          <HiHome 
+            onClick={handleBackAndSave} 
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
+          />
+          <span>Home</span>
+        </div>
         
-        <HiTrash  
-          onClick={() => setShowDeleteModal(true)} 
-          className="text-black w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
-        />
+        <div className="flex flex-col text-white font-extralight">
+          <HiEye
+            onClick={async () => {
+              await saveUpdatedThumbnail();
+              window.open(`/preview/${presentationId}/slide/${currentSlideIndex + 1}`, '_blank');
+            }}
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
+          />
+          <span className="ml-1">View</span>
+        </div>
+        
+        <div className="flex flex-col text-white font-extralight">
+          <HiPencil
+            onClick={() => setShowAddTextModal(true)}
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
+          />
+          <span className="ml-1">Text</span>
+        </div>
+        
+        <div className="flex flex-col text-white font-extralight">
+          <AiFillFileImage
+            onClick={() => setShowAddImageModal(true)} 
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200" 
+          />
+          <span>Image</span>
+        </div>
+
+        <div className="flex flex-col text-white font-extralight">
+          <HiVideoCamera 
+            onClick={() => {
+              
+              setShowAddVideoModal(true);
+            }}
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200"
+          />
+          <span>Video</span>
+        </div>
+
+        <div className="flex flex-col text-white font-extralight">
+          <HiCommandLine
+            onClick={() => {
+              
+              // Reset to add modal mode
+              setIsEditingCode(false); 
+              setEditingCodeElementId(null); 
+              setShowAddCodeModal(true);
+            }}
+            className="text-platinumLight w-11 h-11 cursor-pointer hover:scale-125 transition-transform duration-200"
+          />  
+          <span className="ml-0.5">Code</span>
+        </div>
+        
+        <div className="flex flex-col text-white font-extralight">
+          <HiTrash  
+            onClick={() => setShowDeleteModal(true)} 
+            className="text-platinumLight w-11 h-11  hover:scale-125 transition-transform duration-200"
+          />
+          <span>Delete</span>
+        </div>
 
       </div>
 
       {/* Presentation area*/}
       <div className="flex flex-col flex-grow p-2 space-y-4">
         {/*Title and Thumbnail */}
-        <div className="flex flex-row items-center space-x-6">
+        <div className="flex flex-row items-center justify-between  mt-4">
           {/* Thumbnail */}
           <div className="w-25 h-20 bg-gray-300 rounded flex items-center justify-center cursor-pointer">
             {presentation.thumbnail ? (
@@ -828,23 +848,22 @@ function PresentationEdit() {
                 className="text-gray-500"
                 onClick={() => setShowEditThumbnailModal(true)}
               >
-                + Update Thumbnail
+                Thumbnail
               </span>
             )}
             
             <HiArrowUpOnSquare
                 onClick={() => setShowEditThumbnailModal(true)}
-                className=" bottom-1 right-1 text-primaryBlue w-5 h-5 cursor-pointer hover:scale-110 transition-transform duration-200"
+                className=" bottom-1 right-1 text-primaryBlue w-7 h-7 cursor-pointer hover:scale-125 transition-transform duration-200"
             />
           </div>
-          <div>
-          </div>
+          
           {/* Title 区域 */}
-          <div className="flex items-center justify-center space-x-2">
-            <h2 className="text-2xl font-bold flex items-center justify-center">{presentation.name}</h2>
+          <div className="flex-1 flex flex-row items-center justify-center space-x-2 pr-10">
+            <h2 className="text-3xl font-bold flex items-center justify-center">{presentation.name}</h2>
             <AiFillEdit
               onClick={() => setShowEditTitleModal(true)}
-              className="text-primaryBlue w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+              className="text-primaryBlue w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </div>
         </div>
@@ -855,7 +874,7 @@ function PresentationEdit() {
         <div className="flex flex-row flex-grow space-x-4">
 
           {/* Slide area refine later for shadow*/}
-          <div className="flex-grow flex items-center justify-center  shadow-md rounded-lg">
+          <div className="flex-grow flex items-center justify-center   rounded-lg">
             {/* show slides */}
             <div className="relative w-full max-w-5xl aspect-[16/9] bg-gray-200 flex items-center justify-center rounded-lg"
                 style={{
@@ -881,7 +900,7 @@ function PresentationEdit() {
                 }}>
               
               {/* Slide Index */}
-              <div className="absolute bottom-2 left-2 text-xs text-gray-700 w-12 h-12 flex items-center justify-center"
+              <div className="absolute bottom-2 left-2 text-lg text-gray-700 w-12 h-12 flex items-center justify-center"
                 style={{ zIndex: 1000 }}
               >
                 {currentSlideIndex + 1}
@@ -1018,61 +1037,60 @@ function PresentationEdit() {
           </div>
 
           {/* Slideshow Deck Sidebar */}
-          <div className="w-1/8 flex flex-col">
+          <div className="w-1/8 flex flex-col space-y-6">
             
             <HiTrash  
               onClick={() => deleteSlide(presentation.slides[currentSlideIndex].id)}
-              className="text-red-500 w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+              className=" w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
             />
+
+            <HiEyeDropper 
+              onClick={() => setShowBackgroundModal(true)}
+              className=" w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200"
+            />
+
           </div>
 
         </div>
         
         {/* Control Panel */}
-        <div className="flex flex-row items-center justify-between  p-1 rounded-lg shadow-md space-x-2">
+        <div className="flex flex-row items-center justify-between  p-1 rounded-lg  space-x-2">
 
-
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="max-w-32 md:w-1/4 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200"
-          >
-            Delete Presentation
-          </button>
 
           {/* Add Slide 按钮 */}
 
           <div className="flex-1 flex justify-center">
       
-            <HiPlusCircle 
+            <HiOutlinePlusCircle 
               onClick={addSlide}
-              className="w-10 h-10  text-primaryBlue cursor-pointer hover:scale-110 transition-transform duration-200"
+              className="w-12 h-12  text-black cursor-pointer hover:scale-110 transition-transform duration-200"
             />
           </div>
 
-          <button
+          {/* <button
             onClick={() => setShowBackgroundModal(true)}
             className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600"
           >
-            Set Background
-          </button>
+            Set Backgroudcolor
+          </button> */}
           
           {/* Previous and Next Slide Buttons */}
           <div className="flex flex-row items-center space-x-4">
             {/* Previous Slide Button */}
             <HiChevronLeft
               onClick={currentSlideIndex > 0 ? navigateToPreviousSlide : undefined}
-              className={`w-8 h-8 cursor-pointer transition-transform duration-200 ${
-                currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-primaryBlue hover:scale-110"
+              className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
+                currentSlideIndex === 0 ? "text-gray-400 cursor-not-allowed" : "text-black hover:scale-125"
               }`}
             />
 
             {/* Next Slide Button */}
             <HiChevronRight
               onClick={currentSlideIndex < presentation.slides.length - 1 ? navigateToNextSlide : undefined}
-              className={`w-8 h-8 cursor-pointer transition-transform duration-200 ${
+              className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${
                 currentSlideIndex === presentation.slides.length - 1
                   ? "text-gray-400 cursor-not-allowed"
-                  : "text-primaryBlue hover:scale-110"
+                  : "text-black hover:scale-125"
               }`}
             />
           </div>
@@ -1105,7 +1123,9 @@ function PresentationEdit() {
 
       {/* Edit Title Modal */}
       {showEditTitleModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 1000 }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Title</h3>
             <input
@@ -1129,7 +1149,9 @@ function PresentationEdit() {
 
       {/* Edit Thumbnail Modal */}
       {showEditThumbnailModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 1000 }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Thumbnail</h3>
             <input

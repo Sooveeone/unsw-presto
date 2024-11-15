@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 import axios from '../axiosConfig';
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import hljs from 'highlight.js';
+import 'highlight.js/styles/default.css';
+import javascript from 'highlight.js/lib/languages/javascript';
+import python from 'highlight.js/lib/languages/python';
+import c from 'highlight.js/lib/languages/c';
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('c', c);
 
 function PresentationPreview() {
   const { presentationId, slideIndex } = useParams();
@@ -155,11 +163,7 @@ function PresentationPreview() {
                 allowFullScreen
                 className="object-cover"
               />
-            ) : element.type === 'code' ? (
-              <pre style={{ fontSize: `${element.fontSize}em`, color: element.color }}>
-                {element.text}
-              </pre>
-            ) : null}
+            ) : element.type === 'code' ? renderCodeElement(element) : null}
           </div>
         ))}
       </div>
