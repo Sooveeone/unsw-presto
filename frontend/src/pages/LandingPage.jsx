@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import videoSrc from "../assets/presto-recording.mp4";
 
 function LandingPage() {
   const [loopNum, setLoopNum] = useState(0);
@@ -17,17 +16,14 @@ function LandingPage() {
   const period = 1100;
 
   useEffect(() => {
-    let ticker = setInterval(() => {
-      tick();
-    }, delta);
-
+    const ticker = setInterval(() => tick(), delta);
     return () => clearInterval(ticker);
   }, [text, delta, isDeleting, loopNum]);
 
   const tick = () => {
-    let i = loopNum % toRotate.length;
-    let fullText = toRotate[i];
-    let updatedText = isDeleting
+    const i = loopNum % toRotate.length;
+    const fullText = toRotate[i];
+    const updatedText = isDeleting
       ? fullText.substring(0, text.length - 1)
       : fullText.substring(0, text.length + 1);
 
@@ -54,7 +50,7 @@ function LandingPage() {
       {/* Video Background */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
-        src={videoSrc} // Adjust the path based on your project structure
+        src="/assets/presto-recording.mp4" // Path relative to the `public` folder
         autoPlay
         loop
         muted
