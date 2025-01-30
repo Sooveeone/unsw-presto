@@ -1,8 +1,8 @@
 import axios from "axios";
-// import config from "../backend.config.json";
+import config from "../backend.config.json";
 
-const baseURL = `https://z5404184-presto-be-deploy.vercel.app`;
-// const baseURL = `http://localhost:${config.BACKEND_PORT}`;
+// const baseURL = `https://z5404184-presto-be-deploy.vercel.app`;
+const baseURL = `http://localhost:${config.BACKEND_PORT}`;
 
 const instance = axios.create({
   baseURL: baseURL,
